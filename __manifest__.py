@@ -12,8 +12,10 @@ InfoSaône - Module Odoo 12 pour Fromtome
     'website'    : 'http://www.infosaone.com',
     'depends'    : [
         'base',
+        'sale',
     ],
     'data' : [
+        'views/sale_views.xml',
     ],
     'installable': True,
     'application': True,
