@@ -16,6 +16,7 @@ InfoSaône - Module Odoo 12 pour Fromtome
     ],
     'data' : [
         'views/sale_views.xml',
+        'views/purchase_views.xml',
     ],
     'installable': True,
     'application': True,
