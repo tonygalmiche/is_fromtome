@@ -6,14 +6,32 @@
         <field name="inherit_id" ref="sale.view_order_form" />
         <field name="arch" type="xml">
             <xpath expr="//button[@name='action_unlock']" position="after">
+                <field name="is_creer_commande_fournisseur_vsb"/>
                 <button
                     name="creer_commande_fournisseur_action"
                     type="object"
                     string="Créer les commandes des fournisseurs"
                     class="oe_highlight"
-                    states="draft"
+                    attrs="{'invisible': [('is_creer_commande_fournisseur_vsb', '=', False)]}"
                 />
             </xpath>
+
+            <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='product_id']" position="before">
+                <field name="is_purchase_order_line_id" invisible="1"/>
+                <field name="is_purchase_order_line_id" invisible="1"/>
+                <button 
+                    string="Commande fournisseur" 
+                    name="acceder_commande_fournisseur" 
+                    type="object" icon="fa-search-plus" 
+                    attrs="{'invisible': [('is_purchase_order_line_id', '=', False)]}"
+                />
+
+            </xpath>
+
+            <xpath expr="//form/sheet/notebook/page/field/form/group/group/field[@name='tax_id']" position="before">
+                <field name="is_purchase_order_line_id"/>
+            </xpath>
+
         </field>
     </record>
 </odoo>
