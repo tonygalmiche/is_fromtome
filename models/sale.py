@@ -22,6 +22,39 @@ class SaleOrderLine(models.Model):
             obj.is_purchase_order_line_id = order_id
 
     is_purchase_order_line_id = fields.Many2one('purchase.order.line', string=u'Ligne commande fournisseur', compute='_compute_purchase_order_line_id', readonly=True, store=False)
+    is_date_reception         = fields.Date(string=u'Date réception')
+    is_livraison_directe      = fields.Boolean(string=u'Livraison directe', help=u"Si cette case est cochée, une commande fournisseur spécifique pour ce client sera créée",default=False)
+
+
+    def get_fournisseur_par_defaut(self):
+        now = datetime.date.today()
+        suppliers=self.env['product.supplierinfo'].search([('product_tmpl_id', '=', self.product_id.product_tmpl_id.id)])
+        partner=False
+        for s in suppliers:
+            if now>=s.date_start and now<= s.date_end:
+                partner=s.name
+                break
+        return partner
+
+
+    @api.onchange('product_id','is_livraison_directe')
+    def onchange_product_id_for_date_reception(self):
+        if self.is_livraison_directe:
+            if self.order_id.delivery_date:
+                self.is_date_reception = str(self.order_id.delivery_date)[:10]
+        else:
+            partner = self.get_fournisseur_par_defaut()
+            if partner and partner.is_date_reception:
+                self.is_date_reception = partner.is_date_reception
+
+
+    @api.onchange('is_date_reception')
+    def onchange_is_date_reception(self):
+        if self.is_date_reception:
+            partner = self.get_fournisseur_par_defaut()
+            if partner:
+                partner.write({'is_date_reception': self.is_date_reception})
+
 
     @api.multi
     def acceder_commande_fournisseur(self, vals):
@@ -49,21 +82,21 @@ class SaleOrder(models.Model):
             vsb = False
             for line in obj.order_line:
                 if not line.is_purchase_order_line_id.id:
-                    print(line.is_purchase_order_line_id)
                     vsb=True
                     break
-            print('vsb =',vsb)
             obj.is_creer_commande_fournisseur_vsb=vsb
 
     is_creer_commande_fournisseur_vsb = fields.Boolean(string=u'Créer commande fournisseur', compute='_compute_is_creer_commande_fournisseur_vsb', readonly=True, store=False)
 
+
     @api.multi
     def creer_commande_fournisseur_action(self):
         for obj in self:
-            if not obj.delivery_date:
-                raise Warning(u"Le champ 'Date Livraison' n'est pas renseigné !")
             if not len(obj.order_line):
                 raise Warning(u"Il n'y a aucune ligne de commandes à traiter !")
+            for line in obj.order_line:
+                if not line.is_date_reception:
+                    raise Warning(u"La date de réception n'est pas renseignée sur toutes les lignes")
             now = datetime.date.today()
             for line in obj.order_line:
                 suppliers=self.env['product.supplierinfo'].search([('product_tmpl_id', '=', line.product_id.product_tmpl_id.id)])
@@ -72,18 +105,19 @@ class SaleOrder(models.Model):
                 for s in suppliers:
                     if now>=s.date_start and now<= s.date_end:
                         supplierinfo=s
-                        #partner_id=s.name.id
                         break
                 if supplierinfo:
                     partner_id = supplierinfo.name.id
-                    delivery_date = str(obj.delivery_date)[:10]
-                    date_planned  = delivery_date+' 08:00:00'
+                    date_reception = str(line.is_date_reception)
+                    date_planned  = date_reception+' 08:00:00'
                     filtre=[
                         ('partner_id'  ,'='   , partner_id),
                         ('state'       ,'='   , 'draft'),
-                        ('date_planned','>=', delivery_date+' 00:00:00'),
-                        ('date_planned','<=', delivery_date+' 23:59:59'),
+                        ('date_planned','>=', date_reception+' 00:00:00'),
+                        ('date_planned','<=', date_reception+' 23:59:59'),
                     ]
+                    if line.is_livraison_directe:
+                        filtre.append(('delivery_adress','=', obj.partner_shipping_id.id))
                     orders=self.env['purchase.order'].search(filtre,limit=1)
                     if orders:
                         order=orders[0]
@@ -94,7 +128,8 @@ class SaleOrder(models.Model):
                         order=self.env['purchase.order'].create(vals)
                         if order:
                             order.onchange_partner_id()
-                            #order.date_planned = date_planned
+                            if line.is_livraison_directe:
+                                order.delivery_adress = obj.partner_shipping_id.id
 
                     #** Création des lignes ************************************
                     filtre=[
