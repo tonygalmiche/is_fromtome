@@ -32,6 +32,7 @@ class IsExportCompta(models.Model):
     name       = fields.Char(u"N°Folio", readonly=True)
     date_fin   = fields.Date(u"Date de fin"  , required=True)
     ligne_ids  = fields.One2many('is.export.compta.ligne', 'export_compta_id', u'Lignes')
+    company_id = fields.Many2one('res.company', u'Société',required=True,default=lambda self: self.env.user.company_id.id)
 
 
     @api.model
@@ -59,7 +60,9 @@ class IsExportCompta(models.Model):
                     ai.date,
                     aml.name,
                     aml.debit,
-                    aml.credit
+                    aml.credit,
+                    rp.name,
+                    rp.ref
                 FROM account_move_line aml inner join account_move am                on aml.move_id=am.id
                                            left outer join account_invoice ai        on aml.move_id=ai.move_id
                                            inner join account_account aa             on aml.account_id=aa.id
@@ -67,9 +70,12 @@ class IsExportCompta(models.Model):
                                            inner join account_journal aj             on aml.journal_id=aj.id
                 WHERE 
                     aml.date>='2020-10-01' and
-                    aml.date<='"""+str(obj.date_fin)+"""' 
+                    aml.date<='"""+str(obj.date_fin)+"""' and 
+                    aj.code in ('VE','FACTU','LF/FC','AC') and
+                    am.company_id="""+str(self.env.user.company_id.id)+"""
                 ORDER BY aml.date
             """
+
             cr.execute(sql)
             ct=0
             for row in cr.fetchall():
@@ -83,16 +89,17 @@ class IsExportCompta(models.Model):
                     'ecriture_date'          : row[2],
                     'compte_num'             : row[3],
                     'compte_lib'             : row[4],
+                    'comp_aux_num'           : row[11],
                     'piece_ref'              : row[5],
                     'piece_date'             : row[6],
-                    'ecriture_lib'           : row[7],
+                    'ecriture_lib'           : row[10] or row[7],
                     'debit'                  : row[8],
                     'credit'                 : row[9],
-
                 }
                 self.env['is.export.compta.ligne'].create(vals)
 
-#    comp_aux_num     = fields.Char(u"CompAuxNum")
+
+#         = fields.Char(u"CompAuxNum")
 #    comp_aux_lib     = fields.Char(u"CompAuxLib")
 
 #    piece_ref        = fields.Char(u"PieceRef")
