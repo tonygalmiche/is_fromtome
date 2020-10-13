@@ -21,6 +21,7 @@ InfoSaône - Module Odoo 12 pour Fromtome
         'views/sale_views.xml',
         'views/purchase_views.xml',
         'views/is_export_compta_views.xml',
+        'views/account_invoice_view.xml',
 
     ],
     'installable': True,

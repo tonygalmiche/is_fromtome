@@ -21,6 +21,7 @@
                         <field name="ecriture_lib"/>
                         <field name="debit"/>
                         <field name="credit"/>
+                        <field name="invoice_id"/>
                     </group>
                 </sheet>
             </form>
@@ -59,6 +60,7 @@
                 <field name="comp_aux_lib"/>
                 <field name="piece_ref"/>
                 <field name="ecriture_lib"/>
+                <field name="invoice_id"/>
            </search>
         </field>
     </record>
@@ -91,10 +93,10 @@
             <form>
                 <header>
                     <button
-                        name="export_compta_action"
+                        name="generer_lignes_action"
                         type="object"
-                        string="Export compta"
-                        class="oe_highlight"
+                        string="Générer les lignes"
+                        confirm="Cela va écraser les lignes ?"
                     />
                     <button 
                         name="%(is_export_compta_ligne_action)d"
@@ -102,12 +104,22 @@
                         string="Voir les lignes"
                         attrs="{'invisible': [('ligne_ids', '=', [])]}"
                     />
+                    <button
+                        name="generer_fichier_action"
+                        type="object"
+                        string="Générer fichier à exporter"
+                    />
                 </header>
                 <sheet>
                     <group>
                         <field name="name"/>
                         <field name="company_id" readonly="1"/>
                         <field name="date_fin"/>
+                        <field 
+                            name="file_ids" 
+                            widget="many2many_binary"
+                            readonly="1"
+                        />
                     </group>
                     <field name="ligne_ids" invisible="1"/>
                 </sheet>

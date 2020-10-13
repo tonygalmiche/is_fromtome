@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- account.invoice$ -->
+    <record id="is_invoice_tree" model="ir.ui.view">
+        <field name="name">is_invoice_tree</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_tree" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after" >
+                <field name="is_export_compta_id"/> 
+            </xpath>
+        </field>
+    </record>
+
+
+    <record id="is_invoice_form" model="ir.ui.view">
+        <field name="name">is_invoice_form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_form" />
+        <field name="arch" type="xml">
+            <field name="date_due" position="after">
+                <field name="is_export_compta_id"/>
+            </field>
+        </field>
+    </record>
+
+
+    <record id="is_invoice_supplier_tree" model="ir.ui.view">
+        <field name="name">is_invoice_supplier_tree</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_supplier_tree" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after" >
+                <field name="is_export_compta_id"/> 
+            </xpath>
+        </field>
+    </record>
+
+
+
+    <record id="is_invoice_supplier_form" model="ir.ui.view">
+        <field name="name">is_invoice_supplier_form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_supplier_form" />
+        <field name="arch" type="xml">
+            <field name="date_due" position="after">
+                <field name="is_export_compta_id"/>
+            </field>
+        </field>
+    </record>
+
+
+
+</odoo>
