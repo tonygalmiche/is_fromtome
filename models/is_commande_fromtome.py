@@ -73,7 +73,7 @@ class IsCommandeFromtome(models.Model):
                 order.onchange_partner_id()
             order.order_line.unlink()
             now = datetime.date.today()
-            products = self.env['product.product'].search([('sale_ok','=',True)])
+            products = self.env['product.product'].search([('sale_ok','=',True)],order='name')
             sequence=0
             for product in products:
                 if product.default_code:
