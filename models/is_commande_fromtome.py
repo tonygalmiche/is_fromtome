@@ -55,10 +55,8 @@ class IsCommandeFromtome(models.Model):
         cr,uid,context = self.env.args
         for obj in self:
 
-            if obj.order_id.state!='draft':
+            if obj.order_id and obj.order_id.state!='draft':
                 raise Warning(u"La commande Fromtome associée est déjà validée. Le calcul n'est pas autorisé !")
-
-
 
             obj.ligne_ids.unlink()
 
