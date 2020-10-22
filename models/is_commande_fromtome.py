@@ -20,7 +20,7 @@ class IsCommandeFromtomeLigne(models.Model):
     purchase_qty     = fields.Float(u"Qt Fromtome déja en commande", digits=(14,4))
     product_qty      = fields.Float(u"Qt Fromtome à commander"     , digits=(14,4))
     stock            = fields.Float(u"Stock", digits=(14,2))
-    stock_mini       = fields.Integer(u"Stock mini")
+    stock_mini       = fields.Float(u"Stock mini", digits=(14,2))
     order_line_id    = fields.Many2one('purchase.order.line', u'Ligne commande fournisseur')
 
 
