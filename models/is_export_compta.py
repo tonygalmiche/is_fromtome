@@ -51,11 +51,13 @@ class IsExportCompta(models.Model):
     def generer_lignes_action(self):
         cr,uid,context = self.env.args
         for obj in self:
+            invoices = self.env['account.invoice'].search([('is_export_compta_id','=',obj.id)])
+            for invoice in invoices:
+                invoice.is_export_compta_id=False
             obj.ligne_ids.unlink()
-
             sql="""
                 SELECT  
-                    aj.code,
+                    aj.name,
                     am.name,
                     am.date,
                     aa.code,
@@ -80,14 +82,21 @@ class IsExportCompta(models.Model):
                     ai.is_export_compta_id is null
                 ORDER BY aml.date
             """
-
             cr.execute(sql)
             ct=0
             for row in cr.fetchall():
                 invoice_id = row[12]
                 invoices = self.env['account.invoice'].search([('id','=',invoice_id)])
+                compte_num = row[3]
+                comp_aux_num = ''
+                if compte_num[:3] in ['401','411']:
+                    comp_aux_num = row[11]
                 for invoice in invoices:
                     invoice.is_export_compta_id = obj.id
+                    if compte_num[:3]=='411':
+                        compte_num = invoice.partner_id.property_account_receivable_id.code
+                    if compte_num[:3]=='401':
+                        compte_num = invoice.partner_id.property_account_payable_id.code
                 ct=ct+1
                 vals={
                     'export_compta_id': obj.id,
@@ -95,9 +104,8 @@ class IsExportCompta(models.Model):
                     'journal_code'           : row[0],
                     'ecriture_num'           : row[1],
                     'ecriture_date'          : row[2],
-                    'compte_num'             : row[3],
-                    'compte_lib'             : row[4],
-                    'comp_aux_num'           : row[11],
+                    'compte_num'             : compte_num,
+                    'comp_aux_num'           : comp_aux_num,
                     'piece_ref'              : row[5],
                     'piece_date'             : row[6],
                     'ecriture_lib'           : row[10] or row[7],
@@ -106,8 +114,6 @@ class IsExportCompta(models.Model):
                     'invoice_id'             : invoice_id,
                 }
                 self.env['is.export.compta.ligne'].create(vals)
-
-
 
 
     def generer_fichier_action(self):
@@ -119,12 +125,8 @@ class IsExportCompta(models.Model):
             attachments.unlink()
             dest     = '/tmp/'+name
             f = codecs.open(dest,'wb',encoding='utf-8')
-
             f.write("ligne\tjournal_code\tecriture_num\tecriture_date\tcompte_num\tcomp_aux_num\tpiece_ref\tpiece_date\tecriture_lib\tdebit\tcredit\r\n")
             for row in obj.ligne_ids:
-                #montant='%0.2f' % row.montant
-                #date=row.date_facture
-                #date=date.strftime('%Y%m%d')
                 f.write(str(row.ligne)+'\t')
                 f.write(row.journal_code+'\t')
                 f.write(row.ecriture_num+'\t')
@@ -150,6 +152,5 @@ class IsExportCompta(models.Model):
             }
             attachment = self.env['ir.attachment'].create(vals)
             obj.file_ids=[(6,0,[attachment.id])]
-
 
 
