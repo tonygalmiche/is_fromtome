@@ -43,8 +43,12 @@ class IsCommandeFromtome(models.Model):
         return res
 
 
+
+
+
+
     @api.multi
-    def creer_commande_fromtome_action(self):
+    def calcul_besoins_action(self):
         cr,uid,context = self.env.args
         for obj in self:
             obj.ligne_ids.unlink()
@@ -89,28 +93,39 @@ class IsCommandeFromtome(models.Model):
                         sale_qty = row[2]
                     #***********************************************************
 
-                    #** Commande fournisseur ***********************************
+                    #** Commande Fromtome ***********************************
                     sql="""
                         SELECT  
                             pt.default_code,
                             pol.product_id,
-                            sum(pol.product_qty-pol.qty_received)
+                            pol.product_qty,
+                            (select sum(product_uom_qty) from stock_move sm where sm.purchase_line_id=pol.id and state='done')
                         FROM purchase_order po inner join purchase_order_line pol on po.id=pol.order_id
                                            inner join product_product pp on pol.product_id=pp.id
                                            inner join product_template pt on pp.product_tmpl_id=pt.id
                         WHERE 
                             po.state not in ('done','cancel') and
-                            po.date_planned>='2020-09-01' and
+                            po.date_planned>='2020-10-01' and
                             pol.product_id="""+str(product.id)+""" and
-                            pol.qty_received<pol.product_qty
-                        GROUP BY pt.default_code,pol.product_id
-                        ORDER BY pt.default_code,pol.product_id
+                            pol.qty_received<pol.product_qty and
+                            po.is_commande_soldee='f'
                     """
                     cr.execute(sql)
                     purchase_qty = 0
                     for row in cr.fetchall():
-                        purchase_qty = row[2]
+                        print(row[2],row[3])
+                        purchase_qty += row[2]-(row[3] or 0)
                     #***********************************************************
+
+
+
+#logifrom=# select product_uom_qty,state from stock_move where purchase_line_id=4361;
+# product_uom_qty | state  
+#-----------------+--------
+#           1.000 | cancel
+#           1.000 | done
+
+
 
                     stock_mini=0
                     if obj.stock_mini==True:
@@ -146,5 +161,18 @@ class IsCommandeFromtome(models.Model):
                             'order_line_id': order_line.id,
                         }
                         ligne=self.env['is.commande.fromtome.ligne'].create(vals)
+
+
+    @api.multi
+    def creer_commande_fromtome_action(self):
+        for obj in self:
+            for l in obj.ligne_ids:
+                print(l)
+
+
+
+
+
+
 
 

@@ -79,9 +79,9 @@
                 <header>
                     <field name="ligne_ids" invisible="1"/>
                     <button
-                        name="creer_commande_fromtome_action"
+                        name="calcul_besoins_action"
                         type="object"
-                        string="Créer commande Fromtome"
+                        string="Calcul des besoins"
                         confirm="Confirmer ?"
                     />
                     <button 
@@ -90,7 +90,12 @@
                         string="Voir les lignes"
                         attrs="{'invisible': [('ligne_ids', '=', [])]}"
                     />
-
+                    <button
+                        name="creer_commande_fromtome_action"
+                        type="object"
+                        string="Créer commande Fromtome"
+                        confirm="Confirmer ?"
+                    />
                 </header>
                 <sheet>
                     <group>
