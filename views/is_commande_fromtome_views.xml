@@ -18,6 +18,7 @@
                         <field name="purchase_qty"/>
                         <field name="product_qty"/>
                         <field name="uom_po_id"/>
+                        <field name="factor_inv"/>
                         <field name="order_line_id"/>
                     </group>
                 </sheet>
@@ -38,7 +39,7 @@
                 <field name="purchase_qty"/>
                 <field name="product_qty"/>
                 <field name="uom_po_id"/>
-                <field name="order_line_id"/>
+                <field name="factor_inv"/>
             </tree>
         </field>
     </record>
@@ -89,12 +90,6 @@
                         type="action"
                         string="Voir les lignes"
                         attrs="{'invisible': [('ligne_ids', '=', [])]}"
-                    />
-                    <button
-                        name="creer_commande_fromtome_action"
-                        type="object"
-                        string="Créer commande Fromtome"
-                        confirm="Confirmer ?"
                     />
                 </header>
                 <sheet>

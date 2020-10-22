@@ -4,6 +4,8 @@ import codecs
 import unicodedata
 import base64
 import datetime
+from odoo.exceptions import Warning
+from math import *
 
 
 class IsCommandeFromtomeLigne(models.Model):
@@ -16,12 +18,17 @@ class IsCommandeFromtomeLigne(models.Model):
     product_id       = fields.Many2one('product.product', u'Article')
     uom_id           = fields.Many2one('uom.uom', u"Unité de stock")
     uom_po_id        = fields.Many2one('uom.uom', u"Unité d'achat")
+    factor_inv       = fields.Float(u"Multiple de", digits=(14,4))
     sale_qty         = fields.Float(u"Qt commande client"          , digits=(14,4))
     purchase_qty     = fields.Float(u"Qt Fromtome déja en commande", digits=(14,4))
     product_qty      = fields.Float(u"Qt Fromtome à commander"     , digits=(14,4))
+
     stock            = fields.Float(u"Stock", digits=(14,2))
     stock_mini       = fields.Float(u"Stock mini", digits=(14,2))
     order_line_id    = fields.Many2one('purchase.order.line', u'Ligne commande fournisseur')
+
+
+
 
 
 class IsCommandeFromtome(models.Model):
@@ -43,14 +50,16 @@ class IsCommandeFromtome(models.Model):
         return res
 
 
-
-
-
-
     @api.multi
     def calcul_besoins_action(self):
         cr,uid,context = self.env.args
         for obj in self:
+
+            if obj.order_id.state!='draft':
+                raise Warning(u"La commande Fromtome associée est déjà validée. Le calcul n'est pas autorisé !")
+
+
+
             obj.ligne_ids.unlink()
 
             #** Création commande fournisseur **********************************
@@ -113,18 +122,8 @@ class IsCommandeFromtome(models.Model):
                     cr.execute(sql)
                     purchase_qty = 0
                     for row in cr.fetchall():
-                        print(row[2],row[3])
                         purchase_qty += row[2]-(row[3] or 0)
                     #***********************************************************
-
-
-
-#logifrom=# select product_uom_qty,state from stock_move where purchase_line_id=4361;
-# product_uom_qty | state  
-#-----------------+--------
-#           1.000 | cancel
-#           1.000 | done
-
 
 
                     stock_mini=0
@@ -132,6 +131,9 @@ class IsCommandeFromtome(models.Model):
                         stock_mini = product.is_stock_mini
                     stock = product.qty_available
                     product_qty = sale_qty - stock + stock_mini - purchase_qty
+                    factor_inv = product.uom_po_id.factor_inv
+                    if factor_inv>0:
+                        product_qty = factor_inv*ceil(product_qty/factor_inv)
                     if product_qty>0:
                         sequence+=1
                         vals={
@@ -152,6 +154,7 @@ class IsCommandeFromtome(models.Model):
                             'sequence'     : sequence,
                             'product_id'   : product.id,
                             'uom_po_id'    : product.uom_po_id.id,
+                            'factor_inv'   : factor_inv,
                             'uom_id'       : product.uom_id.id,
                             'sale_qty'     : sale_qty,
                             'purchase_qty' : purchase_qty,
@@ -161,15 +164,6 @@ class IsCommandeFromtome(models.Model):
                             'order_line_id': order_line.id,
                         }
                         ligne=self.env['is.commande.fromtome.ligne'].create(vals)
-
-
-    @api.multi
-    def creer_commande_fromtome_action(self):
-        for obj in self:
-            for l in obj.ligne_ids:
-                print(l)
-
-
 
 
 
