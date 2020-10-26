@@ -85,7 +85,7 @@ class IsCommandeFromtome(models.Model):
                                            inner join product_product pp on sol.product_id=pp.id
                                            inner join product_template pt on pp.product_tmpl_id=pt.id
                         WHERE 
-                            so.state in ('send','sale') and
+                            so.state in ('draft','send','sale') and
                             so.delivery_date>='2020-10-26' and
                             sol.product_id="""+str(product.id)+"""
                         GROUP BY pt.default_code,sol.product_id
@@ -96,6 +96,11 @@ class IsCommandeFromtome(models.Model):
                     for row in cr.fetchall():
                         sale_qty = row[2]
                     #***********************************************************
+
+
+                    if sale_qty>0:
+                        print (product.default_code,sale_qty)
+
 
                     #** Commande Fromtome ***********************************
                     sql="""
