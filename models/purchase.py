@@ -35,6 +35,7 @@ class PurchaseOrder(models.Model):
                             'order_id'       : order.id,
                         }
                         res=self.env['sale.order.line'].sudo().create(vals)
+                        line.price_unit = res.price_unit
 
 
 class PurchaseOrderLine(models.Model):
