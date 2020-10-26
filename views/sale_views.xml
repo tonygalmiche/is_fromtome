@@ -33,6 +33,9 @@
             <xpath expr="//form/sheet/notebook/page/field/form/group/group/field[@name='tax_id']" position="before">
                 <field name="is_purchase_order_line_id" groups="is_fromtome.is_fromtome_group"/>
             </xpath>
+            <field name="validity_date" position="before">
+                <field name="is_commande_soldee"/>
+            </field>
         </field>
     </record>
 </odoo>

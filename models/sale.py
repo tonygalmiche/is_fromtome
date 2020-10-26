@@ -76,6 +76,8 @@ class SaleOrderLine(models.Model):
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
+    is_commande_soldee = fields.Boolean(string=u'Commande soldée', default=False, copy=False, help=u"Cocher cette case pour indiquer qu'aucune nouvelle livraison n'est prévue sur celle-ci")
+
     @api.depends('order_line')
     def _compute_is_creer_commande_fournisseur_vsb(self):
         for obj in self:
