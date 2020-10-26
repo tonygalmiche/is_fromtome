@@ -20,15 +20,12 @@ class IsCommandeFromtomeLigne(models.Model):
     uom_po_id        = fields.Many2one('uom.uom', u"Unité d'achat")
     factor_inv       = fields.Float(u"Multiple de", digits=(14,4))
     sale_qty         = fields.Float(u"Qt commande client"          , digits=(14,4))
-    purchase_qty     = fields.Float(u"Qt Fromtome déja en commande", digits=(14,4))
-    product_qty      = fields.Float(u"Qt Fromtome à commander"     , digits=(14,4))
-
+    purchase_qty     = fields.Float(u"Qt Fromtome déja en commande (US)", digits=(14,4))
+    product_qty      = fields.Float(u"Qt Fromtome à commander (US)"     , digits=(14,4))
+    product_po_qty   = fields.Float(u"Qt Fromtome à commander (UA)"     , digits=(14,4))
     stock            = fields.Float(u"Stock", digits=(14,2))
     stock_mini       = fields.Float(u"Stock mini", digits=(14,2))
     order_line_id    = fields.Many2one('purchase.order.line', u'Ligne commande fournisseur')
-
-
-
 
 
 class IsCommandeFromtome(models.Model):
@@ -106,65 +103,66 @@ class IsCommandeFromtome(models.Model):
                             pt.default_code,
                             pol.product_id,
                             pol.product_qty,
-                            (select sum(product_uom_qty) from stock_move sm where sm.purchase_line_id=pol.id and state='done')
+                            pol.qty_received
                         FROM purchase_order po inner join purchase_order_line pol on po.id=pol.order_id
                                            inner join product_product pp on pol.product_id=pp.id
                                            inner join product_template pt on pp.product_tmpl_id=pt.id
                         WHERE 
-                            po.state not in ('done','cancel') and
+                            po.state not in ('done','cancel','draft') and
                             po.date_planned>='2020-10-01' and
                             pol.product_id="""+str(product.id)+""" and
-                            pol.qty_received<pol.product_qty and
                             po.is_commande_soldee='f'
                     """
+                    #(select sum(product_uom_qty) from stock_move sm where sm.purchase_line_id=pol.id and state='done')
                     cr.execute(sql)
                     purchase_qty = 0
                     for row in cr.fetchall():
-                        purchase_qty += row[2]-(row[3] or 0)
+                        qt = row[2]-(row[3] or 0)
+                        if qt<0:
+                            qt=0
+                        purchase_qty += qt
                     #***********************************************************
-
-
                     stock_mini=0
                     if obj.stock_mini==True:
                         stock_mini = product.is_stock_mini
                     stock = product.qty_available
+                    #Convertir la quantité en UA en US
+                    purchase_qty = product.uom_po_id._compute_quantity(purchase_qty, product.uom_id, round=True, rounding_method='UP', raise_if_failure=True)
                     product_qty = sale_qty - stock + stock_mini - purchase_qty
                     factor_inv = product.uom_po_id.factor_inv
-                    if factor_inv>0:
-                        product_qty = factor_inv*ceil(product_qty/factor_inv)
+                    #if factor_inv>0:
+                    #    product_qty = factor_inv*ceil(product_qty/factor_inv)
                     if product_qty>0:
+                        product_po_qty = product.uom_id._compute_quantity(product_qty, product.uom_po_id, round=True, rounding_method='UP', raise_if_failure=True)
                         sequence+=1
                         vals={
                             'order_id'    : order.id,
                             'sequence'    : sequence,
                             'product_id'  : product.id,
                             'name'        : product.name,
-                            'product_qty' : product_qty,
+                            'product_qty' : product_po_qty,
                             'product_uom' : product.uom_po_id.id,
                             'date_planned': str(now)+' 08:00:00',
                             'price_unit'  : 0,
                         }
                         order_line=self.env['purchase.order.line'].create(vals)
                         order_line.onchange_product_id()
-                        order_line.product_qty = product_qty
+                        order_line.product_qty = product_po_qty
                         vals={
-                            'commande_id'  : obj.id,
-                            'sequence'     : sequence,
-                            'product_id'   : product.id,
-                            'uom_po_id'    : product.uom_po_id.id,
-                            'factor_inv'   : factor_inv,
-                            'uom_id'       : product.uom_id.id,
-                            'sale_qty'     : sale_qty,
-                            'purchase_qty' : purchase_qty,
-                            'product_qty'  : product_qty,
-                            'stock'        : product.qty_available,
-                            'stock_mini'   : stock_mini,
-                            'order_line_id': order_line.id,
+                            'commande_id'   : obj.id,
+                            'sequence'      : sequence,
+                            'product_id'    : product.id,
+                            'uom_po_id'     : product.uom_po_id.id,
+                            'factor_inv'    : factor_inv,
+                            'uom_id'        : product.uom_id.id,
+                            'sale_qty'      : sale_qty,
+                            'purchase_qty'  : purchase_qty,
+                            'product_qty'   : product_qty,
+                            'product_po_qty': product_po_qty,
+                            'stock'         : product.qty_available,
+                            'stock_mini'    : stock_mini,
+                            'order_line_id' : order_line.id,
                         }
                         ligne=self.env['is.commande.fromtome.ligne'].create(vals)
-
-
-
-
 
 
