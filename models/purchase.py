@@ -10,6 +10,12 @@ class PurchaseOrder(models.Model):
     is_commande_soldee = fields.Boolean(string=u'Commande soldée', default=False, copy=False, help=u"Cocher cette case pour indiquer qu'aucune nouvelle livraison n'est prévue sur celle-ci")
 
 
+    @api.multi
+    def creer_commande_fromtome_action(self):
+        for obj in self:
+            print('TEST',obj)
+
+
 class PurchaseOrderLine(models.Model):
     _inherit = "purchase.order.line"
 

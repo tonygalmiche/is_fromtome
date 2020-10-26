@@ -5,6 +5,15 @@
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="purchase.purchase_order_form" />
         <field name="arch" type="xml">
+            <button name="button_unlock" position="after">
+                <button
+                    name="creer_commande_fromtome_action"
+                    type="object"
+                    string="Créer commande dans Fromtome"
+                    class="oe_highlight"
+                    groups="is_fromtome.is_fromelier_group"
+                />
+            </button>
             <field name="date_order" position="after">
                 <field name="is_commande_soldee"/>
             </field>

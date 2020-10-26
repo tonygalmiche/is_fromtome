@@ -136,11 +136,17 @@ class IsCommandeFromtome(models.Model):
                     #Convertir la quantité en UA en US
                     purchase_qty = product.uom_po_id._compute_quantity(purchase_qty, product.uom_id, round=True, rounding_method='UP', raise_if_failure=True)
                     product_qty = sale_qty - stock + stock_mini - purchase_qty
+
+                    if product_qty<0:
+                        product_qty=0
+
+                    product_po_qty = product.uom_id._compute_quantity(product_qty, product.uom_po_id, round=True, rounding_method='UP', raise_if_failure=True)
+
                     factor_inv = product.uom_po_id.factor_inv
                     #if factor_inv>0:
                     #    product_qty = factor_inv*ceil(product_qty/factor_inv)
+                    order_line_id=False
                     if product_qty>0:
-                        product_po_qty = product.uom_id._compute_quantity(product_qty, product.uom_po_id, round=True, rounding_method='UP', raise_if_failure=True)
                         sequence+=1
                         vals={
                             'order_id'    : order.id,
@@ -155,6 +161,8 @@ class IsCommandeFromtome(models.Model):
                         order_line=self.env['purchase.order.line'].create(vals)
                         order_line.onchange_product_id()
                         order_line.product_qty = product_po_qty
+                        order_line_id=order_line.id
+                    if sale_qty>0 or product_qty>0:
                         vals={
                             'commande_id'   : obj.id,
                             'sequence'      : sequence,
@@ -168,7 +176,7 @@ class IsCommandeFromtome(models.Model):
                             'product_po_qty': product_po_qty,
                             'stock'         : product.qty_available,
                             'stock_mini'    : stock_mini,
-                            'order_line_id' : order_line.id,
+                            'order_line_id' : order_line_id,
                         }
                         ligne=self.env['is.commande.fromtome.ligne'].create(vals)
 
