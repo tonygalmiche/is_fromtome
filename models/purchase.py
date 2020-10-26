@@ -16,6 +16,7 @@ class PurchaseOrder(models.Model):
             vals={
                 'company_id': 1,
                 'partner_id': 3779,
+                'user_id'   : 27,
             }
             order=self.env['sale.order'].sudo().create(vals)
             if order:
@@ -23,7 +24,7 @@ class PurchaseOrder(models.Model):
                     default_code =  (line.product_id.default_code or '')[2:]
                     filtre=[
                         ('default_code','=', default_code),
-                        ('company_id'  ,'=', 1)
+                        ('company_id'  ,'=', 1),
                     ]
                     products=self.env['product.product'].sudo().search(filtre,limit=1)
                     for product in products:
