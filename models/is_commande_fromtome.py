@@ -86,6 +86,7 @@ class IsCommandeFromtome(models.Model):
                                            inner join product_template pt on pp.product_tmpl_id=pt.id
                         WHERE 
                             so.state in ('draft','send','sale') and
+                            so.company_id=2 and 
                             (so.is_commande_soldee='f' or so.is_commande_soldee is null) and 
                             so.delivery_date>='2020-10-01' and
                             sol.product_id="""+str(product.id)+"""
