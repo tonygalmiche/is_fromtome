@@ -14,6 +14,7 @@ InfoSaône - Module Odoo 12 pour Fromtome
         'base',
         'sale',
         'account',
+        'b2c_cheese_base',
     ],
     'data' : [
         'security/res.groups.xml',
@@ -22,6 +23,7 @@ InfoSaône - Module Odoo 12 pour Fromtome
         'views/product_views.xml',
         'views/sale_views.xml',
         'views/purchase_views.xml',
+        'views/picking_views.xml',
         'views/is_export_compta_views.xml',
         'views/account_invoice_view.xml',
         'views/stock_move_views.xml',
