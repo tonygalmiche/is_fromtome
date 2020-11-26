@@ -17,7 +17,8 @@
                         <field name="product_id"/>
                         <field name="quantity"/>
                         <field name="price_unit"/>
-                        <field name="montant"/>
+                        <field name="discount"/>
+                        <field name="price_subtotal"/>
                         <field name="invoice_type"/>
                         <field name="state"/>
                     </group>
@@ -39,7 +40,8 @@
                 <field name="description"/>
                 <field name="quantity"/>
                 <field name="price_unit"/>
-                <field name="montant" sum="Total"/>
+                <field name="discount"       sum="Total"/>
+                <field name="price_subtotal" sum="Total"/>
                 <field name="invoice_type"/>
                 <field name="state"/>
             </tree>
@@ -66,9 +68,9 @@
         <field name="model">is.account.invoice.line</field>
         <field name="arch" type="xml">
             <pivot>
-                <field name="date_invoice" type="col"/>
-                <field name="partner_id"   type="row"/>
-                <field name="montant"      type="measure"/>
+                <field name="date_invoice"   type="col"/>
+                <field name="partner_id"     type="row"/>
+                <field name="price_subtotal" type="measure"/>
             </pivot>
         </field>
     </record>
@@ -77,8 +79,8 @@
         <field name="model">is.account.invoice.line</field>
         <field name="arch" type="xml">
             <graph type="bar" orientation="vertical" stacked="False">
-                <field name="date_invoice"       type="row"/>
-                <field name="montant" type="measure"/>
+                <field name="date_invoice"   type="row"/>
+                <field name="price_subtotal" type="measure"/>
             </graph>
         </field>
     </record>

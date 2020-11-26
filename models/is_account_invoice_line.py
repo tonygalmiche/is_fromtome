@@ -19,7 +19,8 @@ class is_account_invoice_line(models.Model):
     description             = fields.Char('Description')
     quantity                = fields.Float('Quantité'              , digits=(14,4))
     price_unit              = fields.Float('Prix unitaire'         , digits=(14,4))
-    montant                 = fields.Float('CA Facturé'            , digits=(14,2))
+    discount                = fields.Float('Remise'                , digits=(14,2))
+    price_subtotal          = fields.Float('Montant HT'            , digits=(14,2))
     invoice_type            = fields.Char('Type de facture')
     state                   = fields.Char('Etat de la facture')
 
@@ -53,7 +54,8 @@ class is_account_invoice_line(models.Model):
                     ail.product_id,
                     fsens(ai.type)*ail.quantity quantity,
                     ail.price_unit,
-                    fsens(ai.type)*(ail.quantity*ail.price_unit) montant,
+                    ail.discount,
+                    fsens(ai.type)*price_subtotal price_subtotal,
                     ai.state
                 from account_invoice ai inner join account_invoice_line ail on ai.id=ail.invoice_id
                                         inner join res_partner              rp on ai.partner_id=rp.id
