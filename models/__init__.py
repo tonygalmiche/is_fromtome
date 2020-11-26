@@ -9,3 +9,4 @@ from . import picking
 from . import is_export_compta
 from . import account_invoice
 from . import is_commande_fromtome
+from . import is_account_invoice_line
