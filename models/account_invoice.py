@@ -7,3 +7,10 @@ class AccountInvoice(models.Model):
 
     is_export_compta_id = fields.Many2one('is.export.compta', 'Folio', copy=False)
 
+
+class AccountPayment(models.Model):
+    _inherit = 'account.payment'
+
+    is_export_compta_id = fields.Many2one('is.export.compta', 'Folio', copy=False)
+
+
