@@ -178,7 +178,7 @@ class IsExportCompta(models.Model):
                         }
                         self.env['is.export.compta.ligne'].create(vals)
                         ct=ct+1
-                        compte_num = partner.property_account_payable_id.code
+                        compte_num = partner.property_account_receivable_id.code
                         vals={
                             'export_compta_id': obj.id,
                             'ligne'           : ct,
