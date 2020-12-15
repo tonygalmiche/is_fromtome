@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="is_product_pricelist_view" model="ir.ui.view">
+            <field name="name">is_product_pricelist_view</field>
+            <field name="model">product.pricelist</field>
+            <field name="inherit_id" ref="product.product_pricelist_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='item_ids']/.." position="after">
+                    <group col="4">
+                        <label for="is_augmentation" string="Pourcentage d'augmentation à appliquer"/>
+                        <div class="o_row">
+                            <field name="is_augmentation" nolabel="1"/>
+                            <span>%%</span>
+                            <button
+                                name="appliquer_augmentation_action"
+                                type="object"
+                                string="Appliquer l'augmentation"
+                                confirm="Êtes-vous certain de vouloir appliquer l'augmentation sur toutes les lignes ?"
+                            />
+                        </div>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
