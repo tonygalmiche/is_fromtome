@@ -19,9 +19,16 @@
         <field name="model">account.invoice</field>
         <field name="inherit_id" ref="account.invoice_form" />
         <field name="arch" type="xml">
+            <field name="number" position="after">
+               <field 
+                    name="is_alerte" style="background-color:orange;" 
+                    readonly="1"
+                    attrs="{'invisible': [('is_alerte', '=', False)]}"
+                />
+            </field>
             <field name="date_due" position="after">
                 <field name="is_export_compta_id"/>
-            </field>
+             </field>
         </field>
     </record>
 
