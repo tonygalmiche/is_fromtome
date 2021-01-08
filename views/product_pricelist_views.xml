@@ -21,6 +21,20 @@
                         </div>
                     </group>
                 </xpath>
+
+
+
+
+                <field name="product_tmpl_id" position="before">
+                    <field name="is_archive" invisible="1"/>
+                    <button 
+                        class="oe_stat_button" name="#" type="object" 
+                        icon="fa-exclamation-triangle" 
+                        title="Article archivé"
+                        attrs="{'invisible': [('is_archive', '=', False)]}"
+                    />
+                </field>
+
             </field>
         </record>
     </data>

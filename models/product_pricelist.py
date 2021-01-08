@@ -15,3 +15,20 @@ class Pricelist(models.Model):
                 price = item.fixed_price + item.fixed_price*obj.is_augmentation/100
                 item.fixed_price = price
             obj.is_augmentation=0
+
+
+
+class PricelistItem(models.Model):
+    _inherit = "product.pricelist.item"
+
+
+    def is_archive(self):
+        for obj in self:
+            test=False
+            if not obj.product_tmpl_id.active:
+                test=True
+                print(obj)
+            obj.is_archive=test
+
+    is_archive = fields.Boolean("Article archivé", compute=is_archive)
+ 
