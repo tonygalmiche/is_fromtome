@@ -27,7 +27,6 @@ class PricelistItem(models.Model):
             test=False
             if not obj.product_tmpl_id.active:
                 test=True
-                print(obj)
             obj.is_archive=test
 
     is_archive = fields.Boolean("Article archivé", compute=is_archive)
