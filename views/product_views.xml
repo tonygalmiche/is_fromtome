@@ -36,6 +36,21 @@ records.exporter_article_fromelier_action()
             <field name="type" position="after">
                 <field name="is_stock_mini"/>
             </field>
+
+            <xpath expr="//page/group/field[@name='description']/.." position="before">
+                <group>
+                    <field name="is_pricelist_item_ids" nolabel="1">
+                        <tree>
+                            <field name="pricelist_id" string="Liste de prix"/>
+                            <field name="fixed_price"  string="Prix de vente"/>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                        </tree>
+                    </field>
+                </group>
+            </xpath>
+
+
         </field>
     </record>
     <record id="is_product_template_tree_view" model="ir.ui.view">
