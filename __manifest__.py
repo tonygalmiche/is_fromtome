@@ -32,6 +32,7 @@ InfoSaône - Module Odoo 12 pour Fromtome
         'views/is_account_invoice_line.xml',
         'views/is_sale_order_line.xml',
         'views/product_pricelist_views.xml',
+        'views/stock_views.xml',
         'wizard/mail_compose_message_view.xml',
     ],
     'installable': True,

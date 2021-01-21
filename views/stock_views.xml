@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="is_view_inventory_form" model="ir.ui.view">
+        <field name="name">is_view_inventory_form</field>
+        <field name="model">stock.inventory</field>
+        <field name="inherit_id" ref="stock.view_inventory_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                    <button name="valorisation_stock_action" class="oe_stat_button" icon="fa-building-o" type="object" states="done">
+                        <div class="o_form_field o_stat_info">
+                            <span class="o_stat_text">Stock valorisé</span>
+                        </div>
+                    </button>
+            </div>
+        </field>
+    </record>
+
+    <record id="is_stock_inventory_line_form" model="ir.ui.view">
+        <field name="name">is_stock_inventory_line_form</field>
+        <field name="model">stock.inventory.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="product_id"/>
+                        <field name="is_default_code"/>
+                        <field name="prod_lot_id"/>
+                        <field name="life_use_date"/>
+                        <field name="product_qty"/>
+                        <field name="product_uom_id"/>
+                        <field name="is_dernier_prix"/>
+                        <field name="is_stock_valorise"/>
+                        <field name="is_uom_facture_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="is_stock_inventory_line_tree" model="ir.ui.view">
+        <field name="name">is_stock_inventory_line_tree</field>
+        <field name="model">stock.inventory.line</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="is_default_code"/>
+                <field name="is_product_name"/>
+                <field name="prod_lot_id"/>
+                <field name="life_use_date"/>
+                <field name="product_qty" sum="Total"/>
+                <field name="product_uom_id"/>
+                <field name="is_dernier_prix"/>
+                <field name="is_stock_valorise" sum="Total"/>
+                <field name="is_uom_facture_id"/>
+            </tree>
+        </field>
+    </record>
+</odoo>

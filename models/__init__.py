@@ -12,4 +12,5 @@ from . import is_commande_fromtome
 from . import is_account_invoice_line
 from . import is_sale_order_line
 from . import product_pricelist
+from . import stock
 
