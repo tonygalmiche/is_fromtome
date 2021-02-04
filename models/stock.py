@@ -70,7 +70,13 @@ class StockProductionLot(models.Model):
     @api.multi
     def archiver_lot_action_server(self):
         for obj in self:
-            if obj.product_qty==0:
-                obj.active=False
+            try:
+                company_id=obj.product_id.company_id.id
+            except:
+                company_id=False
+
+            if company_id and company_id==self.env.user.company_id.id:
+                if obj.product_qty==0:
+                    obj.active=False
 
 
