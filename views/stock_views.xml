@@ -55,4 +55,44 @@
             </tree>
         </field>
     </record>
+
+
+
+    <!-- Archiver les lots à 0  -->
+    <!-- <record id="archiver_lot_action_server" model="ir.actions.server">
+        <field name="name">Archiver les lots à 0</field>
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="model_id" ref="stock.model_stock_production_lot<"/>
+        <field name="binding_model_id" ref="is_fromtome.model_stock_production_lot"/>
+        <field name="code">
+records.exporter_article_fromelier_action()
+        </field>
+    </record> -->
+
+    <record id="archiver_lot_action_server" model="ir.actions.server">
+        <field name="name">Archiver les lots à 0</field>
+        <field name="model_id" ref="stock.model_stock_production_lot"/>
+        <field name="binding_model_id" ref="stock.model_stock_production_lot"/>
+        <field name="state">code</field>
+        <field name="code">action = records.archiver_lot_action_server()</field>
+    </record>
+
+
+   
+    <record id="is_view_production_lot_form" model="ir.ui.view">
+        <field name="name">is_view_production_lot_form</field>
+        <field name="model">stock.production.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form"/>
+        <field name="arch" type="xml">
+            <field name="ref" position="before">
+                <field name="active"/>
+            </field>
+        </field>
+    </record>
+
+
+
+
+
 </odoo>

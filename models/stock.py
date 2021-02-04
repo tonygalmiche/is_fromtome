@@ -60,3 +60,17 @@ class StockInventoryLine(models.Model):
     is_uom_facture_id = fields.Many2one('uom.uom', 'Unité facture', compute=compute_is_dernier_prix, store=False)
 
 
+
+class StockProductionLot(models.Model):
+    _inherit = "stock.production.lot"
+
+    active = fields.Boolean("Actif", default=True)
+
+
+    @api.multi
+    def archiver_lot_action_server(self):
+        for obj in self:
+            if obj.product_qty==0:
+                obj.active=False
+
+
