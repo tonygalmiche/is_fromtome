@@ -53,18 +53,32 @@ class StockInventoryLine(models.Model):
             obj.is_uom_facture_id = uom_id
 
 
-    is_default_code   = fields.Char('Référence interne'    , related='product_id.default_code')
-    is_product_name   = fields.Char('Désignation article'  , related='product_id.name')
-    is_dernier_prix   = fields.Float("Dernier prix facturé"       , compute=compute_is_dernier_prix, store=False)
-    is_stock_valorise = fields.Float("Stock valorisé"             , compute=compute_is_dernier_prix, store=False)
-    is_uom_facture_id = fields.Many2one('uom.uom', 'Unité facture', compute=compute_is_dernier_prix, store=False)
+    is_default_code    = fields.Char('Référence interne'           , related='product_id.default_code')
+    is_product_name    = fields.Char('Désignation article'         , related='product_id.name')
+    is_dernier_prix    = fields.Float("Dernier prix facturé"       , compute=compute_is_dernier_prix, store=False)
+    is_stock_valorise  = fields.Float("Stock valorisé"             , compute=compute_is_dernier_prix, store=False)
+    is_uom_facture_id  = fields.Many2one('uom.uom', 'Unité facture', compute=compute_is_dernier_prix, store=False)
 
 
 
 class StockProductionLot(models.Model):
     _inherit = "stock.production.lot"
 
-    active = fields.Boolean("Actif", default=True)
+    is_article_actif = fields.Boolean('Article actif', related='product_id.active')
+
+
+    # _sql_constraints = [
+    #     ('name_ref_uniq', 'CHECK(1=1)', 'The combination of serial number and product must be unique !'),
+    # ]
+
+    @api.depends('product_id')
+    def compute_is_company_id(self):
+        for obj in self:
+            obj.is_company_id=obj.product_id.company_id.id
+
+
+    is_company_id = fields.Many2one('res.company', 'Société', compute=compute_is_company_id, store=True)
+    active        = fields.Boolean("Actif", default=True)
 
 
     @api.multi
