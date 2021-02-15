@@ -75,6 +75,7 @@
         <field name="priority">0</field>
         <field name="arch" type="xml">
             <field name="product_id" position="after">
+                <field name="product_qty"/>
                 <field name="active"/>
             </field>
         </field>

@@ -36,6 +36,7 @@ class is_stock_production_lot_contrat(models.Model):
     partner_id      = fields.Many2one('res.partner', 'Client')
     contrat_id      = fields.Many2one('contrat.date.client', 'Contrat date')
     date_limite     = fields.Datetime("Date limite contrat", compute=_compute_date_limite, store=False)
+    product_qty     = fields.Float('Quantité', related='lot_id.product_qty')
 
 
     def init(self):
