@@ -11,14 +11,24 @@
                     <field name="_barcode_scanned" widget="barcode_handler"/>
                     <field name="barcode_product_id" invisible="1"/>
                 </form>
-                <!--
                 <field name="name" position="before">
                     <field 
-                        name="is_alertes"
-                        style="background-color:orange;font-size:13pt" 
-                        attrs="{'invisible': [('is_alertes','=', False)],'readonly':True}"/>
+                        name="is_alerte"
+                        style="background-color:orange;font-size:11pt" 
+                        attrs="{'invisible': [('is_alerte','=', False)],'readonly':True}"/>
                 </field>
-                -->
+            </field>
+        </record>
+
+        <record id="is_vpicktree" model="ir.ui.view">
+            <field name="name">is_vpicktree</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.vpicktree"/>
+            <field name="arch" type="xml">
+               <field name="partner_id" position="before">
+                    <field name="is_alerte" invisible="1"/>
+                    <button class="oe_stat_button" icon="fa-exclamation" type="object" name="#" string="Alerte sur les lots" attrs="{'invisible': [('is_alerte', '=', False)]}"/>
+                </field>
             </field>
         </record>
 
@@ -32,7 +42,6 @@
                     <field name="product_barcode_scanner"/>
                 </field>
             </field>
-
         </record>
 
 

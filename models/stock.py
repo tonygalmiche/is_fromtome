@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models, _
 from odoo.exceptions import Warning
-import datetime
+from datetime import datetime, timedelta
 
 
 class StockInventory(models.Model):
@@ -94,3 +94,42 @@ class StockProductionLot(models.Model):
                     obj.active=False
 
 
+class StockMove(models.Model):
+    _inherit = "stock.move"
+
+    @api.onchange('move_line_ids')
+    def _compute_is_alerte(self):
+        for obj in self:
+            if obj.picking_id:
+                state=obj.picking_id.state
+                if state in ['draft', 'cancel', 'waiting', 'confirmed']:
+                    alerte=False
+                else:
+                    date=obj.picking_id.scheduled_date.date()
+                    if state=='assigned' and date<datetime.now().date():
+                        date=datetime.now().date()
+                    alerte=[]
+                    for line in obj.move_line_ids:
+                        date_due = line.life_use_date
+                        if date_due and date_due.date() < date:
+                            alerte.append("Le lot "+line.lot_id.name+" de l'article "+obj.product_id.display_name+" est expiré !")
+                        if date_due and date_due.date() ==date:
+                            alerte.append("Le lot "+line.lot_id.name+" de l'article "+obj.product_id.display_name+" expire aujourd'hui !")
+                        contrat_date_obj = self.env['contrat.date.client'].search(
+                            [('partner_id', '=', obj.picking_id.partner_id.id), ('product_id', '=', obj.product_id.product_tmpl_id.id)], limit=1)
+                        contrat_date = date + timedelta(days=contrat_date_obj.name)
+                        if contrat_date_obj and contrat_date.date() > date_due.date():
+                            alerte.append("Verifiez le Contrat date du client pour le lot "+line.lot_id.name+" de l'article "+obj.product_id.display_name+" !")
+                        contrat_date_obj = self.env['contrat.date.client'].search(
+                            [('partner_id', '=', False), ('product_id', '=', obj.product_id.product_tmpl_id.id)], limit=1)
+                        contrat_date = date + timedelta(days=contrat_date_obj.name)
+                        if contrat_date_obj and contrat_date.date() > date_due.date():
+                            alerte.append("Verifiez le Contrat date Fromtome pour le lot "+line.lot_id.name+" de l'article "+obj.product_id.display_name+" !")
+                    if len(alerte)>0:
+                        alerte='\n'.join(alerte)
+                    else:
+                        alerte=False
+                    obj.is_alerte=alerte
+
+
+    is_alerte = fields.Text('Alerte', copy=False, compute=_compute_is_alerte)

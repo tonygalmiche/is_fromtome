@@ -17,12 +17,28 @@ from datetime import timedelta
 import logging
 
 
-
 class Picking(models.Model):
     _name = 'stock.picking'
     _inherit = ['stock.picking', 'barcodes.barcode_events_mixin']
 
-    #is_alertes = fields.Text('Alertes',copy=False)
+
+    @api.onchange('move_ids_without_package')
+    def _compute_is_alerte(self):
+        for obj in self:
+            obj.is_alerte=str(len(obj.move_ids_without_package))
+            alerte=[]
+            for line in obj.move_ids_without_package:
+                if line.is_alerte:
+                    alerte.append(line.is_alerte)
+            if len(alerte)>0:
+                alerte='\n'.join(alerte)
+            else:
+                alerte=False
+            obj.is_alerte=alerte
+
+
+    is_alerte = fields.Text('Alerte', copy=False, compute=_compute_is_alerte)
+
 
 
     def _add_product(self, product, barcode, qty=1.0):
