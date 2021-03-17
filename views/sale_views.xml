@@ -17,12 +17,12 @@
                 />
             </xpath>
             <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='product_id']" position="before">
-                <field name="is_purchase_order_line_id" invisible="1"/>
+                <field name="is_purchase_line_id" invisible="1"/>
                 <button 
                     string="Commande fournisseur" 
                     name="acceder_commande_fournisseur" 
                     type="object" icon="fa-search-plus" 
-                    attrs="{'invisible': [('is_purchase_order_line_id', '=', False)]}"
+                    attrs="{'invisible': [('is_purchase_line_id', '=', False)]}"
                     groups="is_fromtome.is_fromtome_group"
                 />
             </xpath>
@@ -31,7 +31,7 @@
                 <field name="is_date_reception"    groups="is_fromtome.is_fromtome_group"/>
             </xpath>
             <xpath expr="//form/sheet/notebook/page/field/form/group/group/field[@name='tax_id']" position="before">
-                <field name="is_purchase_order_line_id" groups="is_fromtome.is_fromtome_group"/>
+                <field name="is_purchase_line_id" groups="is_fromtome.is_fromtome_group"/>
             </xpath>
             <field name="validity_date" position="before">
                 <field name="is_commande_soldee"/>

@@ -21,6 +21,7 @@ class is_sale_order_line(models.Model):
     qty_invoiced            = fields.Float('Qt facturée'       , digits=(14,3))
     order_id                = fields.Many2one('sale.order', 'Commande')
     order_line_id           = fields.Many2one('sale.order.line', 'Ligne de commande')
+    is_purchase_line_id     = fields.Many2one('purchase.order.line', 'Ligne cde fournisseur')
     state                   = fields.Selection([
             ('draft', 'Brouillon'),
             ('sent', 'Envoyé'),
@@ -48,6 +49,7 @@ class is_sale_order_line(models.Model):
                     sol.qty_delivered,
                     sol.qty_invoiced ,
                     sol.id                  as order_line_id,
+                    sol.is_purchase_line_id,
                     so.state
                 from sale_order so    inner join sale_order_line     sol on so.id=sol.order_id
                                       inner join product_product      pp on sol.product_id=pp.id
