@@ -123,7 +123,9 @@ class StockMove(models.Model):
                         contrat_date_obj = self.env['contrat.date.client'].search(
                             [('partner_id', '=', False), ('product_id', '=', obj.product_id.product_tmpl_id.id)], limit=1)
                         contrat_date = date + timedelta(days=contrat_date_obj.name)
-                        if contrat_date_obj and contrat_date.date() > date_due.date():
+                        #print(obj,obj.picking_id,contrat_date_obj,contrat_date_obj.product_id,contrat_date,contrat_date,date_due.date())
+                        #print(contrat_date,date_due)
+                        if contrat_date and date_due and contrat_date > date_due.date():
                             alerte.append("Verifiez le Contrat date Fromtome pour le lot "+line.lot_id.name+" de l'article "+obj.product_id.display_name+" !")
                     if len(alerte)>0:
                         alerte='\n'.join(alerte)
