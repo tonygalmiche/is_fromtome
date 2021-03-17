@@ -21,6 +21,7 @@
                         <field name="is_commande_soldee"/>
                         <field name="state"/>
                         <field name="order_line_id"/>
+                        <field name="purchase_order_id"/>
                         <field name="is_purchase_line_id"/>
                     </group>
                 </sheet>
@@ -43,7 +44,7 @@
                 <field name="qty_invoiced" sum="Total"/>
                 <field name="product_uom"/>
                 <field name="is_commande_soldee"/>
-                <field name="is_purchase_line_id"/>
+                <field name="purchase_order_id"/>
                 <field name="state"/>
             </tree>
         </field>
@@ -58,6 +59,7 @@
                 <field name="product_id"/>
                 <field name="is_commande_soldee"/>
                 <field name="state"/>
+                <field name="purchase_order_id"/>
            </search>
         </field>
     </record>

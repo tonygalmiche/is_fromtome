@@ -17,9 +17,9 @@
             <field name="date_order" position="after">
                 <field name="is_commande_soldee"/>
             </field>
-            <xpath expr="//form/sheet/notebook/page/field/form/sheet/group/group/field[@name='company_id']" position="after">
+            <!-- <xpath expr="//form/sheet/notebook/page/field/form/sheet/group/group/field[@name='company_id']" position="after">
                 <field name="is_sale_order_line_id"/>
-            </xpath>
+            </xpath> -->
         </field>
     </record>
 </odoo>

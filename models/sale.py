@@ -158,7 +158,7 @@ class SaleOrder(models.Model):
                                 'product_uom' : line.product_uom.id,
                                 'date_planned': date_planned,
                                 'price_unit'  : line.price_unit,
-                                'is_sale_order_line_id': line.id,
+                                #'is_sale_order_line_id': line.id,
                             }
                             order_line=self.env['purchase.order.line'].create(vals)
                             order_line.onchange_product_id()
