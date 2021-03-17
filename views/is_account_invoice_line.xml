@@ -38,7 +38,7 @@
                 <field name="partner_id"/>
                 <field name="product_id"/>
                 <field name="description"/>
-                <field name="quantity"/>
+                <field name="quantity"       sum="Total"/>
                 <field name="price_unit"/>
                 <field name="discount"       sum="Total"/>
                 <field name="price_subtotal" sum="Total"/>
