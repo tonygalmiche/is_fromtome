@@ -44,6 +44,14 @@ class Picking(models.Model):
     def _add_product(self, product, barcode, qty=1.0):
 
 
+        print("## barcode,product = ",barcode,product)
+
+
+
+        #if product:
+        #    qty=product.uom_id.factor_inv or 1
+
+        #print("## qty=",qty)
 
 
         line = self.move_ids_without_package.filtered(lambda r: r.product_id.id == product.id)
@@ -58,7 +66,7 @@ class Picking(models.Model):
             if line:
                 if line.reserved_availability >= line.quantity_done+qty:
                     if line.is_colis:
-                        line.move_line_ids[0].qty_done += 1
+                        line.move_line_ids[0].qty_done += qty
                     line.move_line_ids[0].split_qty()
                     # line.quantity_done += qty
                     message = _("La quantité de %s est %s ") % (product.name, line.quantity_done)
@@ -81,6 +89,11 @@ class Picking(models.Model):
                         'location_dest_id': self.location_dest_id.id,
                         'state': 'draft',
                     }
+
+
+                    print("## vals =",vals)
+
+
                     line = self.move_lines.new(vals)
                     line.onchange_product_id()
                     self.move_lines += line
@@ -93,6 +106,15 @@ class Picking(models.Model):
             n=len(line.move_line_ids)-1
             if n>0:
                 if str(barcode)[:2] in ("10"):
+
+
+                    # Modif faite le 21/05/2021 pour mettre la quantité sur les articles de type Pièce
+                    if product:
+                        if product.uom_id.category_id.name=="Pièce":
+                            qty=product.uom_id.factor_inv or 1
+                            line.move_line_ids[n].write({'weight': qty})
+
+
                     line.move_line_ids[n].write({'lot_name' : code} )
                     lot = self.env['stock.production.lot'].search([('name','=',code)],limit=1)
                     if not lot:
@@ -120,6 +142,12 @@ class Picking(models.Model):
                     #     print('-- no pass date')
 
                     date_due = dateparser.parse(code, date_formats=['%y%m%d'])
+
+                    print("## barcode,date_due = ",n,barcode,date_due)
+
+
+
+
                     contrat_date_obj = self.env['contrat.date.client'].search(
                         [('partner_id', '=', self.partner_id.id),
                          ('product_id', '=', product.product_tmpl_id.id)], limit=1)
@@ -138,10 +166,33 @@ class Picking(models.Model):
                 elif str(barcode)[:2] in ("31"):
                     decimal = int(str(barcode)[3])
                     code = float(str(barcode)[4:-decimal] + '.' + str(barcode)[-decimal:])
+
+                    print("## barcode,decimal,code = ",n,barcode,decimal,code,line.move_line_ids[n].weight_uom_id.category_id.name)
+
+
+
                     if line.move_line_ids[n].weight_uom_id.category_id.name == "Poids":
                         line.move_line_ids[n].write({'weight': code * line.move_line_ids[n].product_uom_qty, 'product_weight':code * line.move_line_ids[n].product_uom_qty} )
                     else:
-                        line.move_line_ids[n].write({'product_weight': code * line.move_line_ids[n].product_uom_qty})
+
+                        product_weight = code * line.move_line_ids[n].product_uom_qty
+
+                        print("## barcode,decimal,code,product_weight = ",n,barcode,decimal,code,product_weight)
+
+
+                        line.move_line_ids[n].write({'product_weight': product_weight})
+                        #line.move_line_ids[n].write({'weight': 123})
+
+
+                        #line.move_line_ids[n].write({'qty_done': 12})
+
+
+
+                        print("## barcode,move_line_ids = ",line.move_line_ids[n], line.move_line_ids[n].weight)
+
+
+
+
 
                     line._cal_move_weight()
                 # elif str(barcode)[:2] in ("37"):
@@ -161,10 +212,22 @@ class Picking(models.Model):
             self.env.user.notify_danger(message=_('Status does not allow scanning') )
             return
         product = self.env['product.product'].search([('barcode', '=', barcode)])
+
+        print('## TEST 1 barcode,product',barcode,product)
+
+
+
         today = datetime.now().date()
         if not product:
             product_tmpl = self.env['product.supplierinfo'].search([('barcode', '=', barcode),('date_end','>=',today)],limit=1).product_tmpl_id
             product = self.env['product.product'].search([('product_tmpl_id', '=', product_tmpl.id)],limit=1)
+
+
+        print('## TEST 2 barcode,product',barcode,product)
+
+
+
+
 
         if product:
             message = _('product ean13 yes is  %s') % (product.name)
@@ -180,6 +243,12 @@ class Picking(models.Model):
             if product:
                 self._add_product(product, barcode)
                 self.barcode_product_id =  product.id
+
+
+            print('## TEST 3 barcode,product',barcode,product)
+
+
+
 
         elif str(barcode)[:2] in ('10','15','17','31','37'):
             self._add_product(self.barcode_product_id, barcode)
