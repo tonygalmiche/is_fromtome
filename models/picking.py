@@ -112,6 +112,8 @@ class Picking(models.Model):
                     if product:
                         if product.uom_id.category_id.name=="Pièce":
                             qty=product.uom_id.factor_inv or 1
+                            if qty <1:
+                                qty=1
                             line.move_line_ids[n].write({'weight': qty})
 
 
