@@ -114,9 +114,9 @@ class StockMove(models.Model):
                         for line in obj.move_line_ids:
                             date_due = line.life_use_date
                             if date_due and date_due.date() < date:
-                                alerte.append("Le lot "+line.lot_id.name+" de l'article "+obj.product_id.display_name+" est expiré !")
+                                alerte.append("Le lot "+str(line.lot_id.name)+" de l'article "+str(obj.product_id.display_name)+" est expiré !")
                             if date_due and date_due.date() ==date:
-                                alerte.append("Le lot "+line.lot_id.name+" de l'article "+obj.product_id.display_name+" expire aujourd'hui !")
+                                alerte.append("Le lot "+str(line.lot_id.name)+" de l'article "+str(obj.product_id.display_name)+" expire aujourd'hui !")
                             #contrat_date_obj = self.env['contrat.date.client'].search(
                             #    [('partner_id', '=', obj.picking_id.partner_id.id), ('product_id', '=', obj.product_id.product_tmpl_id.id)], limit=1)
                             #contrat_date = date + timedelta(days=contrat_date_obj.name)
