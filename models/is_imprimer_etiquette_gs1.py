@@ -33,38 +33,48 @@ class IsImprimerEtiquetteGS1(models.Model):
     @api.onchange('code_gs1')
     def code_gs1_change(self):
         if self.code_gs1:
-            lines = self.code_gs1.split('\n')
-            for line in lines:
-                line=line.strip()
-                if line:
-                    if line[:2] in ['00','01','02']:
-                        code_ean = line[2:]
-                        self.code_ean = code_ean
+            lines = self.code_gs1.strip().split('\n')
 
-                        products = self.env['product.product'].search([('barcode', '=', code_ean)])
-                        print(products)
-                        for product in products:
-                            self.product_id = product.id
 
-                    if line[:2]=='10':
-                        self.lot = line[2:]
- 
-                    if line[:2]=='15':
-                        dluo = self.str2date(line[2:])
-                        self.dluo = dluo
+            if len(lines)==1:
+                self.code_ean = lines[0].strip()
 
-                    if line[:2]=='17':
-                        dlc = self.str2date(line[2:])
-                        self.dlc = dlc
 
-                    if line[:2]=='31':
-                        nb_decimales = float(line[3:4])
-                        if nb_decimales>0:
-                            poids = float(line[4:]) / (10**nb_decimales)
-                            self.poids = poids
+            if len(lines)>1:
+                for line in lines:
+                    line=line.strip()
+                    if line:
+                        if line[:2] in ['00','01','02']:
+                            code_ean = line[2:]
+                            self.code_ean = code_ean
+                        if line[:2]=='10':
+                            self.lot = line[2:]
+    
+                        if line[:2]=='15':
+                            dluo = self.str2date(line[2:])
+                            self.dluo = dluo
 
-                    if line[:2]=='37':
-                        self.nb_pieces = int(line[2:])
+                        if line[:2]=='17':
+                            dlc = self.str2date(line[2:])
+                            self.dlc = dlc
+
+                        if line[:2]=='31':
+                            nb_decimales = float(line[3:4])
+                            if nb_decimales>0:
+                                poids = float(line[4:]) / (10**nb_decimales)
+                                self.poids = poids
+
+                        if line[:2]=='37':
+                            self.nb_pieces = int(line[2:])
+
+            if self.code_ean:
+                products = self.env['product.product'].search([('barcode', '=', self.code_ean)])
+                print(products)
+                for product in products:
+                    self.product_id = product.id
+
+
+
 
 
     @api.multi
