@@ -69,9 +69,13 @@ class IsImprimerEtiquetteGS1(models.Model):
 
             if self.code_ean:
                 products = self.env['product.product'].search([('barcode', '=', self.code_ean)])
-                print(products)
                 for product in products:
                     self.product_id = product.id
+
+
+            if self.product_id and not self.lot:
+                self.lot=self.product_id.default_code+datetime.now().strftime("%j%y")
+
 
 
 
