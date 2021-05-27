@@ -145,4 +145,5 @@ class IsImprimerEtiquetteGS1(models.Model):
             f.close()
 
             cmd = "lpr -P GX430T " + dest
-            subprocess.check_call(cmd, shell=True)
+            for x in range(0, obj.qt_imprime):
+                subprocess.check_call(cmd, shell=True)
