@@ -177,13 +177,13 @@ class Picking(models.Model):
                         raise UserError(_('Vérifiez date expiration produit !'))
 
                     line.move_line_ids[n].write({"life_use_date": date_due} )
-                    line.move_line_ids[n].lot_id.write({"use_date": date_due})
+                    #line.move_line_ids[n].lot_id.write({"use_date": date_due})
 
 
 
                 elif str(barcode)[:2] in ("17"):
                     line.move_line_ids[n].write({"life_use_date" : dateparser.parse(code, date_formats=['%y%m%d'])} )
-                    line.move_line_ids[n].lot_id.write({"life_date": dateparser.parse(code, date_formats=['%y%m%d'])})
+                    #line.move_line_ids[n].lot_id.write({"life_date": dateparser.parse(code, date_formats=['%y%m%d'])})
 
 
                 elif str(barcode)[:2] in ("31"):
