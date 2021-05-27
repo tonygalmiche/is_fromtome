@@ -44,7 +44,7 @@ class Picking(models.Model):
     def _add_product(self, product, barcode, qty=1.0):
 
 
-        print("## barcode,product = ",barcode,product)
+        print("##### barcode,product,qty = ",barcode,product,qty)
 
 
 
@@ -68,7 +68,10 @@ class Picking(models.Model):
                     if line.is_colis:
                         line.move_line_ids[0].qty_done += qty
                     line.move_line_ids[0].split_qty()
-                    # line.quantity_done += qty
+
+
+
+                    #line.quantity_done += qty
                     message = _("La quantité de %s est %s ") % (product.name, line.quantity_done)
                     #raise UserError(message)
                     self.env.user.notify_info(message=message)
@@ -108,13 +111,23 @@ class Picking(models.Model):
                 if str(barcode)[:2] in ("10"):
 
 
+                    print("###### barcode = ",n,barcode)
+
+
                     # Modif faite le 21/05/2021 pour mettre la quantité sur les articles de type Pièce
                     if product:
                         if product.uom_id.category_id.name=="Pièce":
                             qty=product.uom_id.factor_inv or 1
                             if qty <1:
                                 qty=1
+
+
+                            print("###### qty = ",n,barcode,qty)
+
+
                             line.move_line_ids[n].write({'weight': qty})
+
+                    print("######  weight 1 =",line.move_line_ids[n].weight)
 
 
                     line.move_line_ids[n].write({'lot_name' : code} )
@@ -127,6 +140,11 @@ class Picking(models.Model):
                         self.env.user.notify_info(message=message)
 
                     line.move_line_ids[n].write({'lot_id': lot.id})
+
+
+
+                    print("######  weight 2 =",line.move_line_ids[n].weight)
+
 
                     message = _('lot numéro  %s') % (lot.name)
                     self.env.user.notify_info(message=message)
