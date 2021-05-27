@@ -30,16 +30,12 @@ class IsImprimerEtiquetteGS1(models.Model):
         return dt
 
 
-    @api.onchange('code_gs1')
+    @api.onchange('code_gs1','product_id')
     def code_gs1_change(self):
         if self.code_gs1:
             lines = self.code_gs1.strip().split('\n')
-
-
             if len(lines)==1:
                 self.code_ean = lines[0].strip()
-
-
             if len(lines)>1:
                 for line in lines:
                     line=line.strip()
@@ -66,19 +62,12 @@ class IsImprimerEtiquetteGS1(models.Model):
 
                         if line[:2]=='37':
                             self.nb_pieces = int(line[2:])
-
-            if self.code_ean:
-                products = self.env['product.product'].search([('barcode', '=', self.code_ean)])
-                for product in products:
-                    self.product_id = product.id
-
-
-            if self.product_id and not self.lot:
-                self.lot=self.product_id.default_code+datetime.now().strftime("%j%y")
-
-
-
-
+        if self.code_ean:
+            products = self.env['product.product'].search([('barcode', '=', self.code_ean)])
+            for product in products:
+                self.product_id = product.id
+        if self.product_id and not self.lot:
+            self.lot=self.product_id.default_code+datetime.now().strftime("%j%y")
 
 
     @api.multi
