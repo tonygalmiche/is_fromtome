@@ -94,6 +94,9 @@ class IsImprimerEtiquetteGS1(models.Model):
             code_gs1 += ">83103"+("000000"+str(int(obj.poids*1000)))[-6:]
             #code_gs1 += ">837"+str(obj.nb_pieces)
 
+            #code_gs1 = ">;>8011234567890123421123456>810>6ABC123>810>6ABC123"
+
+	        #code_gs1=">;> 8011234567890123421123456> 810> 6ABC123"
 
             code_gs1f = ""
             code_gs1f += "(01)"+code_ean
@@ -119,7 +122,7 @@ class IsImprimerEtiquetteGS1(models.Model):
 ^CF0,40                                     ^FX CF0 = Choix de la foncte (font 0) et taille de 40pt
 ^FO0,330^FDArticle : %s^FS                  ^FX Position et texte
 
-^CF0,24                                     ^FX CF0 = Choix de la fonte (font 0) et taille de 30pt
+^CF0,40                                     ^FX CF0 = Choix de la fonte (font 0) et taille de 30pt
 ^FO0,380^FD%s^FS                            ^FX Position et texte
 
 ^CF0,40                                     ^FX CF0 = Choix de la foncte (font 0) et taille de 40pt
