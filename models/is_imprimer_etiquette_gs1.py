@@ -76,22 +76,22 @@ class IsImprimerEtiquetteGS1(models.Model):
 
             code_gs1 = ">;"
             code_gs1 += ">801"+code_ean
+            code_gs1 += ">810"+lot
             if obj.dluo:
                 code_gs1+=">815"+obj.dluo.strftime("%y%m%d")
             if obj.dlc:
                 code_gs1+=">817"+obj.dlc.strftime("%y%m%d")
-            code_gs1 += ">810"+lot
             code_gs1 += ">83103"+("000000"+str(int(obj.poids*1000)))[-6:]
             #code_gs1 += ">837"+str(obj.nb_pieces)
 
 
             code_gs1f = ""
             code_gs1f += "(01)"+code_ean
+            code_gs1f += " (10)"+lot
             if obj.dluo:
                 code_gs1f+=" (15)"+obj.dluo.strftime("%y%m%d")
             if obj.dlc:
                 code_gs1f+=" (17)"+obj.dlc.strftime("%y%m%d")
-            code_gs1f += " (10)"+lot
             code_gs1f += " (3103)"+("000000"+str(int(obj.poids*1000)))[-6:]
             #code_gs1f += " (37)"+str(obj.nb_pieces)
 

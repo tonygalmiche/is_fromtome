@@ -94,7 +94,7 @@ class Picking(models.Model):
                     }
 
 
-                    print("## vals =",vals)
+                    #print("## vals =",vals)
 
 
                     line = self.move_lines.new(vals)
@@ -111,7 +111,7 @@ class Picking(models.Model):
                 if str(barcode)[:2] in ("10"):
 
 
-                    print("###### barcode = ",n,barcode)
+                    #print("###### barcode = ",n,barcode)
 
 
                     # Modif faite le 21/05/2021 pour mettre la quantité sur les articles de type Pièce
@@ -122,12 +122,12 @@ class Picking(models.Model):
                                 qty=1
 
 
-                            print("###### qty = ",n,barcode,qty)
+                            #print("###### qty = ",n,barcode,qty)
 
 
                             line.move_line_ids[n].write({'weight': qty})
 
-                    print("######  weight 1 =",line.move_line_ids[n].weight)
+                    #print("######  weight 1 =",line.move_line_ids[n].weight)
 
 
                     line.move_line_ids[n].write({'lot_name' : code} )
@@ -143,7 +143,7 @@ class Picking(models.Model):
 
 
 
-                    print("######  weight 2 =",line.move_line_ids[n].weight)
+                    #print("######  weight 2 =",line.move_line_ids[n].weight)
 
 
                     message = _('lot numéro  %s') % (lot.name)
@@ -163,10 +163,7 @@ class Picking(models.Model):
 
                     date_due = dateparser.parse(code, date_formats=['%y%m%d'])
 
-                    print("## barcode,date_due = ",n,barcode,date_due)
-
-
-
+                    #print("## barcode,date_due = ",n,barcode,date_due)
 
                     contrat_date_obj = self.env['contrat.date.client'].search(
                         [('partner_id', '=', self.partner_id.id),
@@ -180,14 +177,20 @@ class Picking(models.Model):
                         raise UserError(_('Vérifiez date expiration produit !'))
 
                     line.move_line_ids[n].write({"life_use_date": date_due} )
+                    line.move_line_ids[n].lot_id.write({"use_date": date_due})
+
+
 
                 elif str(barcode)[:2] in ("17"):
                     line.move_line_ids[n].write({"life_use_date" : dateparser.parse(code, date_formats=['%y%m%d'])} )
+                    line.move_line_ids[n].lot_id.write({"life_date": dateparser.parse(code, date_formats=['%y%m%d'])})
+
+
                 elif str(barcode)[:2] in ("31"):
                     decimal = int(str(barcode)[3])
                     code = float(str(barcode)[4:-decimal] + '.' + str(barcode)[-decimal:])
 
-                    print("## barcode,decimal,code = ",n,barcode,decimal,code,line.move_line_ids[n].weight_uom_id.category_id.name)
+                    #print("## barcode,decimal,code = ",n,barcode,decimal,code,line.move_line_ids[n].weight_uom_id.category_id.name)
 
 
 
@@ -197,7 +200,7 @@ class Picking(models.Model):
 
                         product_weight = code * line.move_line_ids[n].product_uom_qty
 
-                        print("## barcode,decimal,code,product_weight = ",n,barcode,decimal,code,product_weight)
+                        #print("## barcode,decimal,code,product_weight = ",n,barcode,decimal,code,product_weight)
 
 
                         line.move_line_ids[n].write({'product_weight': product_weight})
@@ -208,7 +211,7 @@ class Picking(models.Model):
 
 
 
-                        print("## barcode,move_line_ids = ",line.move_line_ids[n], line.move_line_ids[n].weight)
+                        #print("## barcode,move_line_ids = ",line.move_line_ids[n], line.move_line_ids[n].weight)
 
 
 
@@ -226,14 +229,14 @@ class Picking(models.Model):
 
 
     def on_barcode_scanned(self, barcode):
-        print('barcode---',barcode,self.env.user,self)
+        #print('barcode---',barcode,self.env.user,self)
 
         if self.state not in ['draft', 'assigned']:
             self.env.user.notify_danger(message=_('Status does not allow scanning') )
             return
         product = self.env['product.product'].search([('barcode', '=', barcode)])
 
-        print('## TEST 1 barcode,product',barcode,product)
+        #print('## TEST 1 barcode,product',barcode,product)
 
 
 
@@ -243,7 +246,7 @@ class Picking(models.Model):
             product = self.env['product.product'].search([('product_tmpl_id', '=', product_tmpl.id)],limit=1)
 
 
-        print('## TEST 2 barcode,product',barcode,product)
+        #print('## TEST 2 barcode,product',barcode,product)
 
 
 
@@ -265,7 +268,7 @@ class Picking(models.Model):
                 self.barcode_product_id =  product.id
 
 
-            print('## TEST 3 barcode,product',barcode,product)
+            #print('## TEST 3 barcode,product',barcode,product)
 
 
 
