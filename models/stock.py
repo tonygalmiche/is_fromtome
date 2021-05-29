@@ -67,9 +67,37 @@ class StockProductionLot(models.Model):
     is_article_actif = fields.Boolean('Article actif', related='product_id.active')
 
 
-    # _sql_constraints = [
-    #     ('name_ref_uniq', 'CHECK(1=1)', 'The combination of serial number and product must be unique !'),
-    # ]
+    #TODO le 29/05/21 => La suppression de la contrainte ci-dessous ne fonctionne pas => J'a modifié Odoo en dure pour y arriver
+    #_sql_constraints = [
+    #    ('name_ref_uniq', 'CHECK(1=1)', 'The combination of serial number and product must be unique !'),
+    #]
+    # def _auto_init(self, cr, context=None):
+    #     self._sql_constraints = [
+    #         ('serial_no', 'CHECK(1=1)', "Another asset already exists with this serial number!"),
+    #     ]
+    #     super(StockProductionLot, self)._auto_init(cr, context)
+    #@api.model_cr_context
+    #def _auto_init(self):
+    #    super(StockProductionLot, self)._auto_init()
+    #    self._sql_constraints += [
+    #        ('name_ref_uniq', 'CHECK(1=1)', 'The combination of serial number and product must be unique !'),
+    #    ]
+    #    self._add_sql_constraints()
+
+
+    @api.constrains('name','product_id','is_company_id','active')
+    def _check_lot_unique(self):
+        for obj in self:
+            filtre=[
+                ('name', '=' , obj.name),
+                ('id'  , '!=', obj.id),
+                ('product_id'  , '=', obj.product_id.id),
+                ('is_company_id', '=', obj.is_company_id.id),
+            ]
+            lots = self.env['stock.production.lot'].search(filtre, limit=1)
+            if lots:
+                raise Warning("Ce lot existe déjà !") 
+
 
     @api.depends('product_id')
     def compute_is_company_id(self):

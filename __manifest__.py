@@ -14,6 +14,8 @@ InfoSaône - Module Odoo 12 pour Fromtome
         'base',
         'sale',
         'account',
+        'product',
+        'stock',
         'b2c_cheese_base',
     ],
     'data' : [

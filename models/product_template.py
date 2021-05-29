@@ -2,6 +2,33 @@
 from odoo import api, fields, models, _
 
 
+
+class ProductProduct(models.Model):
+    _inherit = "product.product"
+
+    @api.constrains('barcode','active','product_tmpl_id')
+    def _check_barcode_unique(self):
+        for obj in self:
+            filtre=[
+                ('barcode', '=' , obj.barcode),
+                ('id'  , '!=', obj.id),
+                ('product_tmpl_id.company_id', '=', obj.product_tmpl_id.company_id.id),
+            ]
+            products = self.env['product.product'].sudo().search(filtre, limit=1)
+            if products:
+                raise Warning("Le code barre doit-être unique !") 
+
+
+
+
+    #    self._sql_constraints += [
+    #        ('name_ref_uniq', 'CHECK(1=1)', 'The combination of serial number and product must be unique !'),
+    #    ]
+
+
+
+
+
 class ProductTemplate(models.Model):
     _inherit = "product.template"
 
