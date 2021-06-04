@@ -16,6 +16,10 @@
                         name="is_alerte"
                         style="background-color:orange;font-size:11pt" 
                         attrs="{'invisible': [('is_alerte','=', False)],'readonly':True}"/>
+                    <field 
+                        name="is_info"
+                        style="background-color:chartreuse;font-size:13pt" 
+                        attrs="{'invisible': [('is_info','=', False)],'readonly':True}"/>
                 </field>
             </field>
         </record>

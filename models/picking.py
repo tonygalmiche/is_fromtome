@@ -13,7 +13,7 @@ from odoo.osv import expression
 from odoo.tools.float_utils import float_compare, float_is_zero
 from datetime import datetime
 from datetime import timedelta
-
+import pytz
 import logging
 
 
@@ -35,16 +35,17 @@ class Picking(models.Model):
             else:
                 alerte=False
             obj.is_alerte=alerte
+            #obj.is_info=False
 
 
     is_alerte = fields.Text('Alerte', copy=False, compute=_compute_is_alerte)
-
+    is_info   = fields.Text('Info'  , copy=False, compute=_compute_is_alerte)
 
 
     def _add_product(self, product, barcode, qty=1.0):
 
 
-        print("##### barcode,product,qty = ",barcode,product,qty)
+        print("##### barcode,product,qty = ",self,barcode,product,qty)
 
 
 
@@ -71,14 +72,33 @@ class Picking(models.Model):
 
 
 
+
+                    tz = pytz.timezone('Europe/Paris')
+                    paris_now = datetime.now(tz).strftime("%H:%M:%S")
+
                     #line.quantity_done += qty
-                    message = _("La quantité de %s est %s ") % (product.name, line.quantity_done)
+                    message = _("%s : %s : qt=%s ") % (paris_now, product.name, line.quantity_done)
                     #raise UserError(message)
-                    self.env.user.notify_info(message=message)
+                    #self.env.user.notify_info(message=message)
+                    self.is_info=message
+
+
+                    #if self.is_info:
+                    #    self.is_info+="\n"+message
+                    #else:
+                    #    self.is_info=message
+
+
+
+
                 else:
                     message = 'La quantité réservée de '+str(line.reserved_availability)+' est déja atteinte !'
-                    raise UserError(message)
-                    self.env.user.notify_warning(message=message)
+                    self.is_alerte = message
+                    #self.is_info   = False
+
+
+                    #raise UserError(message)
+                    #self.env.user.notify_warning(message=message)
             else:
                 if self.state == 'draft':
                     vals = {
@@ -139,7 +159,13 @@ class Picking(models.Model):
                         message = _('lot créé  %s') % (lot.name)
                         self.env.user.notify_info(message=message)
 
-                    line.move_line_ids[n].write({'lot_id': lot.id})
+
+
+                    picking_id = line.move_line_ids[0].picking_id.id
+                    print("### TEST ",self,picking_id)
+
+
+                    line.move_line_ids[n].write({'picking_id': picking_id,'lot_id': lot.id})
 
 
 
@@ -147,7 +173,15 @@ class Picking(models.Model):
 
 
                     message = _('lot numéro  %s') % (lot.name)
-                    self.env.user.notify_info(message=message)
+                    #self.env.user.notify_info(message=message)
+                    if self.is_info:
+                        self.is_info+=" : "+message
+                    else:
+                        self.is_info=message
+
+
+
+
 
                 elif str(barcode)[:2] in ("15"):
                     # date_due = dateparser.parse(code, date_formats=['%y%m%d'])
@@ -231,8 +265,15 @@ class Picking(models.Model):
     def on_barcode_scanned(self, barcode):
         #print('barcode---',barcode,self.env.user,self)
 
+        #if self.is_info:
+        #    self.is_info+="\n"+barcode
+        #else:
+        #    self.is_info=barcode
+
+
         if self.state not in ['draft', 'assigned']:
-            self.env.user.notify_danger(message=_('Status does not allow scanning') )
+            self.is_alerte="Le BL doit-être à l'état Prêt !"
+            #self.env.user.notify_danger(message=_('Status does not allow scanning') )
             return
         product = self.env['product.product'].search([('barcode', '=', barcode)])
 
