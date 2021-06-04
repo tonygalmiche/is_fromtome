@@ -68,67 +68,42 @@ class IsImprimerEtiquetteGS1(models.Model):
                 self.product_id = product.id
         if self.product_id and not self.lot:
             self.lot=self.product_id.default_code+datetime.now().strftime("%j%y")
+        if self.product_id:
+            code_ean =  ((self.product_id.default_code or '')+"00000000000000")[:14]
+            self.code_ean = code_ean
 
 
     @api.multi
     def imprimer_etiquette_action(self):
         for obj in self:
-            code_ean = ("00000000000000"+(obj.product_id.barcode or ''))[-14:]
-            lot      = ("00000000000000000000"+(obj.lot or ''))[-20:]
-
-
-            code_gs1 = ">;"
-            code_gs1 += ">801"+code_ean
-            code_gs1 += ">810"+lot
+            code_ean = self.code_ean or ''
+            lot      = obj.lot or ''
+           
+            gs1 = "(01)"+code_ean
             if obj.dluo:
-                code_gs1+=">815"+obj.dluo.strftime("%y%m%d")
+                gs1+=" (15)"+obj.dluo.strftime("%y%m%d")
             if obj.dlc:
-                code_gs1+=">817"+obj.dlc.strftime("%y%m%d")
-            code_gs1 += ">83103"+("000000"+str(int(obj.poids*1000)))[-6:]
-            #code_gs1 += ">837"+str(obj.nb_pieces)
-
-            #code_gs1 = ">;>8011234567890123421123456>810>6ABC123>810>6ABC123"
-
-	        #code_gs1=">;> 8011234567890123421123456> 810> 6ABC123"
-
-            code_gs1f = ""
-            code_gs1f += "(01)"+code_ean
-            code_gs1f += " (10)"+lot
-            if obj.dluo:
-                code_gs1f+=" (15)"+obj.dluo.strftime("%y%m%d")
-            if obj.dlc:
-                code_gs1f+=" (17)"+obj.dlc.strftime("%y%m%d")
-            code_gs1f += " (3103)"+("000000"+str(int(obj.poids*1000)))[-6:]
-            #code_gs1f += " (37)"+str(obj.nb_pieces)
-
+                gs1+=" (17)"+obj.dlc.strftime("%y%m%d")
+            gs1+=" (3103)"+("000000"+str(int(obj.poids*1000)))[-6:]
+            gs1+=" (10)"+lot
             ZPL="""
 ^XA
-^CI28
-^BY2                            ^FX BY = Taille du code barre
-^FO0,100                        ^FX Positionnement
-^BCN,150,N,N,Y                  ^FX Type de code barre
-^FD%s^FS                        ^FX Code barre
-
-^CF0,24                                     ^FX CF0 = Choix de la foncte (font 0) et taille de 30pt
-^FO0,280^FD%s^FS                            ^FX Legende du code barre
-
+^BY3
+^FO50,50^BCN,150,Y,N,,D
+^FD%s^FS
 ^CF0,40                                     ^FX CF0 = Choix de la foncte (font 0) et taille de 40pt
-^FO0,330^FDArticle : %s^FS                  ^FX Position et texte
-
+^FO50,330^FDArticle : %s^FS                 ^FX Position et texte
 ^CF0,40                                     ^FX CF0 = Choix de la fonte (font 0) et taille de 30pt
-^FO0,380^FD%s^FS                            ^FX Position et texte
-
-^CF0,40                                     ^FX CF0 = Choix de la foncte (font 0) et taille de 40pt
-^FO0,430^FDCode EAN (01) : %s^FS            ^FX Position et texte
-^FO0,480^FDLot (10) : %s^FS                 ^FX Position et texte
-^FO0,580^FDDDM (15) : %s^FS                ^FX Position et texte
-^FO0,530^FDDLC (17) : %s^FS                 ^FX Position et texte
-^FO0,630^FDPoids (3103) : %s^FS             ^FX Position et texte
-^FO0,680^FDNb pièces (37) : %s^FS
+^FO50,380^FD%s^FS                           ^FX Position et texte
+^FO50,430^FDCode EAN (01) : %s^FS           ^FX Position et texte
+^FO50,480^FDLot (10) : %s^FS                ^FX Position et texte
+^FO50,580^FDDDM (15) : %s^FS                ^FX Position et texte
+^FO50,530^FDDLC (17) : %s^FS                ^FX Position et texte
+^FO50,630^FDPoids (3103) : %s^FS            ^FX Position et texte
+^FO50,680^FDNb pièces (37) : %s^FS
 ^XZ
             """ % (
-                code_gs1,
-                code_gs1f,
+                gs1,
                 obj.product_id.default_code,
                 obj.product_id.name,
                 code_ean,

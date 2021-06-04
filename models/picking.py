@@ -403,6 +403,9 @@ class StockMoveLine(models.Model):
 
     @api.onchange('qty_done','product_uom_qty')
     def delete_line_qty_zero(self):
+
+        print("#### delete_line_qty_zero ####",self,self.product_uom_qty)
+
         if self.product_uom_qty == 0:
             self.unlink()
 
