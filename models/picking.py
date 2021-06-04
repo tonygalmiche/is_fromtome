@@ -165,8 +165,8 @@ class Picking(models.Model):
                     print("### TEST ",self,picking_id)
 
 
-                    #line.move_line_ids[n].write({'picking_id': picking_id,'lot_id': lot.id})
-                    line.move_line_ids[n].write({'lot_id': lot.id})
+                    line.move_line_ids[n].write({'picking_id': picking_id,'lot_id': lot.id})
+                    #line.move_line_ids[n].write({'lot_id': lot.id})
 
 
 
