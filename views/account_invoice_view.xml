@@ -29,6 +29,12 @@
             <field name="date_due" position="after">
                 <field name="is_export_compta_id"/>
              </field>
+            <field name="partner_id" position="attributes">
+                <attribute name="domain">[('customer','=',True),('is_company','=',True)]</attribute>
+            </field>
+            <field name="partner_shipping_id" position="attributes">
+                <attribute name="domain">['|',('id','=',partner_id),('parent_id','=',partner_id)]</attribute>
+            </field>
         </field>
     </record>
 
