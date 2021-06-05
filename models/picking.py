@@ -211,6 +211,8 @@ class Picking(models.Model):
                     elif date_due and date_due.date() == datetime.now().date():
                         raise UserError(_('Vérifiez date expiration produit !'))
 
+
+                    print("#### life_use_date=",date_due,line.move_line_ids[n])
                     line.move_line_ids[n].write({"life_use_date": date_due} )
                     line.move_line_ids[n].lot_id.write({"use_date": date_due})
 
@@ -396,8 +398,6 @@ class Picking(models.Model):
         return
 
 
-
-
 class StockMoveLine(models.Model):
     _inherit = "stock.move.line"
 
@@ -416,6 +416,19 @@ class StockMoveLine(models.Model):
                 print('this lot is incompatible with this product .')
                 # raise ValidationError(_('This lot %s is incompatible with this product %s' % (
                 # line.lot_id.name, line.product_id.display_name)))
+
+    @api.multi
+    def write(self, vals):
+        res=super(StockMoveLine, self).write(vals)
+        for obj in self:
+            if obj.product_id and obj.lot_id and obj.life_use_date:
+                if not obj.lot_id.use_date and not obj.lot_id.life_date:
+                    print("### StockMoveLine ### obj=",obj)
+                    if obj.lot_id.type_traçabilite=="ddm":
+                        obj.lot_id.write({"use_date": obj.life_use_date})
+                    else:
+                        obj.lot_id.write({"life_date": obj.life_use_date})
+        return res
 
 
 class StockQuant(models.Model):

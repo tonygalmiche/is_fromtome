@@ -88,16 +88,15 @@ class StockProductionLot(models.Model):
     @api.constrains('name','product_id','is_company_id','active')
     def _check_lot_unique(self):
         for obj in self:
-            print(obj)
-            # filtre=[
-            #     ('name', '=' , obj.name),
-            #     ('id'  , '!=', obj.id),
-            #     ('product_id'  , '=', obj.product_id.id),
-            #     ('is_company_id', '=', obj.is_company_id.id),
-            # ]
-            # lots = self.env['stock.production.lot'].search(filtre, limit=1)
-            # if lots:
-            #     raise Warning("Ce lot existe déjà !") 
+            filtre=[
+                ('name', '=' , obj.name),
+                ('id'  , '!=', obj.id),
+                ('product_id'  , '=', obj.product_id.id),
+                ('is_company_id', '=', obj.is_company_id.id),
+            ]
+            lots = self.env['stock.production.lot'].search(filtre, limit=1)
+            if lots:
+                raise Warning("Ce lot existe déjà !") 
 
 
     @api.depends('product_id')
