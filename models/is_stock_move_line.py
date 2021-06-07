@@ -6,6 +6,7 @@ from datetime import timedelta
 
 class is_stock_move_line(models.Model):
     _name='is.stock.move.line'
+    _description='is.stock.move.line'
     _order='product_id'
     _auto = False
 

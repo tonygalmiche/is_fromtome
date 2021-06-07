@@ -5,6 +5,7 @@ from odoo.tools.sql import drop_view_if_exists
 
 class is_account_invoice_line(models.Model):
     _name='is.account.invoice.line'
+    _description='is.account.invoice.line'
     _order='id desc'
     _auto = False
 

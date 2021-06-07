@@ -5,6 +5,7 @@ from odoo.tools.sql import drop_view_if_exists
 
 class is_sale_order_line(models.Model):
     _name='is.sale.order.line'
+    _description='is.sale.order.line'
     _order='id desc'
     _auto = False
 

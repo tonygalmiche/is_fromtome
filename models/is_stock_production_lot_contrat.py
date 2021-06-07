@@ -9,6 +9,7 @@ from datetime import timedelta
 
 class is_stock_production_lot_contrat(models.Model):
     _name='is.stock.production.lot.contrat'
+    _description='is.stock.production.lot.contrat'
     _order='partner_id,product_id,lot_id'
     _auto = False
 
