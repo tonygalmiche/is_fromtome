@@ -18,6 +18,7 @@ class is_stock_move_line(models.Model):
     product_tmpl_id = fields.Many2one('product.template', "Modèle d'article")
     move_id         = fields.Many2one('stock.move', 'Mouvement de stock')
     lot_id          = fields.Many2one('stock.production.lot', 'Lot')
+    life_use_date   = fields.Datetime('DLC/DDM')
     product_uom_id  = fields.Many2one('uom.uom', 'Unité')
     qty_done        = fields.Float('Qt')
     weight          = fields.Char('Poids')
@@ -39,6 +40,7 @@ class is_stock_move_line(models.Model):
                     pp.product_tmpl_id,
                     l.move_id,
                     l.lot_id,
+                    l.life_use_date,
                     l.product_uom_id,
                     l.qty_done,
                     l.weight,

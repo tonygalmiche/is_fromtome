@@ -14,6 +14,7 @@
                         <field name="product_tmpl_id"/>
                         <field name="move_id"/>
                         <field name="lot_id"/>
+                        <field name="life_use_date"/>
                         <field name="product_uom_id"/>
                         <field name="qty_done"/>
                         <field name="weight"/>
@@ -34,6 +35,7 @@
                 <field name="product_id"/>
                 <field name="move_id"/>
                 <field name="lot_id"/>
+                <field name="life_use_date"/>
                 <field name="product_uom_id"/>
                 <field name="qty_done"/>
                 <field name="weight"/>
