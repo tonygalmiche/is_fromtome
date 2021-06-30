@@ -91,6 +91,7 @@ class IsImprimerEtiquetteGS1(models.Model):
             gs1+=" (10)"+lot
             ZPL="""
 ^XA
+^CI28
 ^BY3
 ^FO50,50^BCN,150,Y,N,,D
 ^FD%s^FS
