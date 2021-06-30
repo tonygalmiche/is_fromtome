@@ -19,6 +19,9 @@ class IsFNC(models.Model):
     status_move      = fields.Selection(string='Statut', selection=[('receptionne', 'Réceptionné'),('manquant', 'Manquant'), ('abime', 'Abimé'), ('autre', 'Autre')], required=True)
     description      = fields.Text('Description de la non-conformité')
     cause            = fields.Text('Causes')
+    decision         = fields.Text('Décision')
+    analyse          = fields.Text('Analyse de la cause')
+    action_immediate = fields.Text('Action immédiate')
     action_immediate = fields.Text('Action immédiate')
     state            = fields.Selection([
             ('en_cours', 'En cours'),

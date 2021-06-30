@@ -53,20 +53,6 @@ records.exporter_article_fromelier_action()
 
         </field>
     </record>
-    <record id="is_product_template_tree_view" model="ir.ui.view">
-        <field name="name">is_product_template_tree_view</field>
-        <field name="model">product.template</field>
-        <field name="inherit_id" ref="product.product_template_tree_view"/>
-        <field name="arch" type="xml">
-            <field name="type" position="after">
-                <field name="is_stock_mini"/>
-            </field>
-        </field>
-    </record>
-
-
-
-
     <record id="is_product_template_kanban_view" model="ir.ui.view">
         <field name="name">is_product_template_kanban_view</field>
         <field name="model">product.template</field>
@@ -77,8 +63,6 @@ records.exporter_article_fromelier_action()
             </xpath>
         </field>
     </record>
-
-
     <record id="is_product_template_tree_view" model="ir.ui.view">
         <field name="name">is_product_template_tree_view</field>
         <field name="model">product.template</field>
@@ -90,10 +74,25 @@ records.exporter_article_fromelier_action()
             <xpath expr="//field[@name='website_id']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
+            <field name="type" position="after">
+                <field name="is_stock_mini"/>
+            </field>
+            <field name="name" position="after">
+                <field name="barcode"/>
+            </field>
         </field>
     </record>
 
-
+    <record id="is_product_template_search_view" model="ir.ui.view">
+        <field name="name">is_product_template_search_view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+             <field name="name" position="after">
+                <field name="barcode"/>
+            </field>
+        </field>
+    </record>
 
 
 
