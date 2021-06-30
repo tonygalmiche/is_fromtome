@@ -9,7 +9,7 @@ class IsFNC(models.Model):
     name             = fields.Char(u"N°FNC", readonly=True)
     company_id       = fields.Many2one('res.company', 'Société'    , required=True, default=lambda self: self.env.user.company_id.id, readonly=True)
     emetteur_id      = fields.Many2one('res.users'   , 'Émetteur'  , required=True, default=lambda self: self.env.user.id, readonly=True)
-    date_creation    = fields.Date("Date de création"              , required=True, default=lambda *a: fields.Date.today(), readonly=True)
+    date_creation    = fields.Date("Date de création"              , required=True, default=lambda *a: fields.Date.today())
     move_line_id     = fields.Many2one('stock.move.line', 'Ligne de mouvement')
     partner_id       = fields.Many2one('res.partner', 'Partenaire', required=True, help="Client ou fournisseur")
     picking_id       = fields.Many2one('stock.picking', 'Livraison/Réception', required=True)
