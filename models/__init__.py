@@ -16,4 +16,5 @@ from . import stock
 from . import is_stock_production_lot_contrat
 from . import is_stock_move_line
 from . import is_imprimer_etiquette_gs1
+from . import is_fnc
 

@@ -76,8 +76,8 @@
     <menuitem
         id="is_stock_move_line_menu"
         name="Lignes des Mouvements"
-        parent="stock.menu_warehouse_report"
-        sequence="900"
+        parent="stock.menu_stock_inventory_control"
+        sequence="909"
         action="is_stock_move_line_action"
     />
 

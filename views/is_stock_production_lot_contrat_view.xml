@@ -71,7 +71,7 @@
         id="is_stock_production_lot_contrat_menu"
         name="Lots avec contrat client"
         parent="stock.menu_stock_inventory_control"
-        sequence="910"
+        sequence="901"
         action="is_stock_production_lot_contrat_action"
     />
 
