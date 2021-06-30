@@ -11,6 +11,8 @@ class IsFNC(models.Model):
     emetteur_id      = fields.Many2one('res.users'   , 'Émetteur'  , required=True, default=lambda self: self.env.user.id, readonly=True)
     date_creation    = fields.Date("Date de création"              , required=True, default=lambda *a: fields.Date.today(), readonly=True)
     move_line_id     = fields.Many2one('stock.move.line', 'Ligne de mouvement')
+    partner_id       = fields.Many2one('res.partner', 'Partenaire', required=True, help="Client ou fournisseur")
+    picking_id       = fields.Many2one('stock.picking', 'Livraison/Réception', required=True)
     product_id       = fields.Many2one('product.product', 'Produit', required=True)
     lot_id           = fields.Many2one('stock.production.lot', 'N° de lot')
     dlc_ddm          = fields.Date('DLC/DDM')
@@ -38,6 +40,10 @@ class StockMoveLine(models.Model):
     def _compute_is_creer_fnc_vsb(self):
         for obj in self:
             vsb = True
+            fncs=self.env['is.fnc'].search([('move_line_id', '=', obj.id)])
+            print(fncs)
+            if len(fncs)>0:
+                vsb=False
             obj.is_creer_fnc_vsb=vsb
 
     @api.depends('status_move')
@@ -63,6 +69,8 @@ class StockMoveLine(models.Model):
             if not fnc_id:
                 vals={
                     'move_line_id': obj.id,
+                    'partner_id'  : obj.move_id.picking_id.partner_id.id,
+                    'picking_id'  : obj.move_id.picking_id.id,
                     'product_id'  : obj.move_id.product_id.id,
                     'lot_id'      : obj.lot_id.id,
                     'dlc_ddm'     : obj.life_use_date,
