@@ -94,10 +94,14 @@ records.exporter_article_fromelier_action()
         </field>
     </record>
 
-
-
-
-
-
-
+    <record id="is_product_normal_form_view" model="ir.ui.view">
+        <field name="name">is_product_normal_form_view</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+             <field name="type" position="before">
+                <field name="product_tmpl_id"/>
+            </field>
+        </field>
+    </record>
 </odoo>

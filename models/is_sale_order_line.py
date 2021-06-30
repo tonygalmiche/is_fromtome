@@ -15,6 +15,7 @@ class is_sale_order_line(models.Model):
     is_commande_soldee      = fields.Boolean('Commande soldée')
     partner_id              = fields.Many2one('res.partner', 'Client')
     product_id              = fields.Many2one('product.product', 'Article')
+    barcode                 = fields.Char('Code barre')
     product_uom             = fields.Many2one('uom.uom', 'Unité')
     description             = fields.Char('Description')
     product_uom_qty         = fields.Float('Qt cde'            , digits=(14,3))
@@ -45,6 +46,7 @@ class is_sale_order_line(models.Model):
                     so.delivery_date,
                     so.partner_id, 
                     sol.product_id, 
+                    pp.barcode,
                     sol.product_uom,
                     sol.name as description,
                     sol.product_uom_qty,
