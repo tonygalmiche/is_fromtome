@@ -40,6 +40,7 @@ InfoSaône - Module Odoo 12 pour Fromtome
         'views/res_partner_view.xml',
         'views/is_imprimer_etiquette_gs1_views.xml',
         'views/is_fnc_views.xml',
+        'report/delivery_template.xml',
         'wizard/mail_compose_message_view.xml',
     ],
     'installable': True,

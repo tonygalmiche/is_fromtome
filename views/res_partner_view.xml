@@ -5,6 +5,11 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
+            <field name="property_product_pricelist" position="after">
+                <field name="is_iln"/>
+                <field name="is_gln"/>
+
+            </field>
             <xpath expr="//notebook" position="after">
                 <group>
                     <field name="is_product_supplierinfo_ids" nolabel="1">
