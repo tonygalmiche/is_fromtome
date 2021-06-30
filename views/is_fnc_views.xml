@@ -41,6 +41,10 @@
                         <field name="description"/>
                         <field name="cause"/>
                         <field name="action_immediate"/>
+                        <field name="decision"/>
+                        <field name="analyse"/>
+                        <field name="action_corrective"/>
+                        <field name="date_cloture"/>
                     </group>
                 </sheet>
             </form>
@@ -62,7 +66,6 @@
                 <field name="status_move"/>
                 <field name="description"/>
                 <field name="cause"/>
-                <field name="action_immediate"/>
                 <field name="state"/>
             </tree>
         </field>
@@ -81,7 +84,6 @@
                 <field name="status_move"/>
                 <field name="description"/>
                 <field name="cause"/>
-                <field name="action_immediate"/>
                 <field name="state"/>
            </search>
         </field>

@@ -6,24 +6,25 @@ class IsFNC(models.Model):
     _description = "Fiche de non-conformité Client / Fournisseur"
     _order = 'name desc'
 
-    name             = fields.Char(u"N°FNC", readonly=True)
-    company_id       = fields.Many2one('res.company', 'Société'    , required=True, default=lambda self: self.env.user.company_id.id, readonly=True)
-    emetteur_id      = fields.Many2one('res.users'   , 'Émetteur'  , required=True, default=lambda self: self.env.user.id, readonly=True)
-    date_creation    = fields.Date("Date de création"              , required=True, default=lambda *a: fields.Date.today())
-    move_line_id     = fields.Many2one('stock.move.line', 'Ligne de mouvement')
-    partner_id       = fields.Many2one('res.partner', 'Partenaire', required=True, help="Client ou fournisseur")
-    picking_id       = fields.Many2one('stock.picking', 'Livraison/Réception', required=True)
-    product_id       = fields.Many2one('product.product', 'Produit', required=True)
-    lot_id           = fields.Many2one('stock.production.lot', 'N° de lot')
-    dlc_ddm          = fields.Date('DLC/DDM')
-    status_move      = fields.Selection(string='Statut', selection=[('receptionne', 'Réceptionné'),('manquant', 'Manquant'), ('abime', 'Abimé'), ('autre', 'Autre')], required=True)
-    description      = fields.Text('Description de la non-conformité')
-    cause            = fields.Text('Causes')
-    decision         = fields.Text('Décision')
-    analyse          = fields.Text('Analyse de la cause')
-    action_immediate = fields.Text('Action immédiate')
-    action_immediate = fields.Text('Action immédiate')
-    state            = fields.Selection([
+    name              = fields.Char(u"N°FNC", readonly=True)
+    company_id        = fields.Many2one('res.company', 'Société'    , required=True, default=lambda self: self.env.user.company_id.id, readonly=True)
+    emetteur_id       = fields.Many2one('res.users'   , 'Émetteur'  , required=True, default=lambda self: self.env.user.id, readonly=True)
+    date_creation     = fields.Date("Date de création"              , required=True, default=lambda *a: fields.Date.today())
+    move_line_id      = fields.Many2one('stock.move.line', 'Ligne de mouvement')
+    partner_id        = fields.Many2one('res.partner', 'Partenaire', required=True, help="Client ou fournisseur")
+    picking_id        = fields.Many2one('stock.picking', 'Livraison/Réception', required=True)
+    product_id        = fields.Many2one('product.product', 'Produit', required=True)
+    lot_id            = fields.Many2one('stock.production.lot', 'N° de lot')
+    dlc_ddm           = fields.Date('DLC/DDM')
+    status_move       = fields.Selection(string='Statut', selection=[('receptionne', 'Réceptionné'),('manquant', 'Manquant'), ('abime', 'Abimé'), ('autre', 'Autre')], required=True)
+    description       = fields.Text('Description de la non-conformité')
+    cause             = fields.Text('Causes')
+    action_immediate  = fields.Text('Action immédiate')
+    decision          = fields.Text('Décision')
+    analyse           = fields.Text('Analyse des causes')
+    action_corrective = fields.Text('Action corrective proposée')
+    date_cloture      = fields.Date("Date cloture")
+    state             = fields.Selection([
             ('en_cours', 'En cours'),
             ('solde'   , 'Soldé'),
         ], 'État', default="en_cours")
