@@ -39,10 +39,18 @@
                 <field name="product_uom_id"/>
                 <field name="qty_done"/>
                 <field name="weight"/>
+                <field name="creer_fnc_vsb" invisible="1"/>
                 <button 
                     string="Créer FNC" 
                     name="creer_fnc_action" 
                     type="object" icon="fa-plus" 
+                    attrs="{'invisible': [('creer_fnc_vsb', '=', False)]}"
+                />
+               <button 
+                    string="Accès FNC" 
+                    name="acces_fnc_action" 
+                    type="object" icon="fa-search-plus" 
+                    attrs="{'invisible': [('creer_fnc_vsb', '=', True)]}"
                 />
                 <field name="status_move"/>
             </tree>

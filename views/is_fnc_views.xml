@@ -122,13 +122,12 @@
                     type="object" icon="fa-plus" 
                     attrs="{'invisible': [('is_creer_fnc_vsb', '=', False)]}"
                 />
-                <!-- <field name="is_acces_fnc_vsb" invisible="1"/>
                 <button 
                     string="Accès FNC" 
                     name="acces_fnc_action" 
                     type="object" icon="fa-search-plus" 
-                    attrs="{'invisible': [('is_acces_fnc_vsb', '=', False)]}"
-                /> -->
+                    attrs="{'invisible': [('is_creer_fnc_vsb', '=', True)]}"
+                />
             </field>
         </field>
     </record>

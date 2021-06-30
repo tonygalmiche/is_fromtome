@@ -41,27 +41,16 @@ class StockMoveLine(models.Model):
         for obj in self:
             vsb = True
             fncs=self.env['is.fnc'].search([('move_line_id', '=', obj.id)])
-            print(fncs)
             if len(fncs)>0:
                 vsb=False
             obj.is_creer_fnc_vsb=vsb
 
-    @api.depends('status_move')
-    def _compute_is_acces_fnc_vsb(self):
-        for obj in self:
-            vsb = True
-            obj.is_acces_fnc_vsb=vsb
-
     is_creer_fnc_vsb = fields.Boolean(string='Créer FNC visibility', compute='_compute_is_creer_fnc_vsb', readonly=True, store=False)
-    is_acces_fnc_vsb = fields.Boolean(string='Créer FNC visibility', compute='_compute_is_acces_fnc_vsb', readonly=True, store=False)
 
     @api.multi
     def creer_fnc_action(self):
         for obj in self:
-
             fncs=self.env['is.fnc'].search([('move_line_id', '=', obj.id)])
-
-            print(fncs)
             fnc_id=False
             for fnc in fncs:
                 fnc_id=fnc.id
@@ -92,5 +81,18 @@ class StockMoveLine(models.Model):
     @api.multi
     def acces_fnc_action(self):
         for obj in self:
-            print(obj)
- 
+            fncs=self.env['is.fnc'].search([('move_line_id', '=', obj.id)])
+            fnc_id=False
+            for fnc in fncs:
+                fnc_id=fnc.id
+            if fnc_id:
+                res= {
+                    'name': 'FNC',
+                    'view_mode': 'form,tree',
+                    'view_type': 'form',
+                    'res_model': 'is.fnc',
+                    'type': 'ir.actions.act_window',
+                    'res_id':fnc_id,
+                }
+                return res
+

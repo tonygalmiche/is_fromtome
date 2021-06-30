@@ -10,6 +10,17 @@ class is_stock_move_line(models.Model):
     _order='product_id'
     _auto = False
 
+
+    @api.depends('status_move')
+    def _compute_creer_fnc_vsb(self):
+        for obj in self:
+            vsb = True
+            fncs=self.env['is.fnc'].search([('move_line_id', '=', obj.move_line_id.id)])
+            if len(fncs)>0:
+                vsb=False
+            obj.creer_fnc_vsb=vsb
+
+
     company_id      = fields.Many2one('res.company', 'Société')
     picking_id      = fields.Many2one('stock.picking', 'Picking')
     picking_type_id = fields.Many2one('stock.picking.type', 'Type')
@@ -24,6 +35,8 @@ class is_stock_move_line(models.Model):
     qty_done        = fields.Float('Qt')
     weight          = fields.Char('Poids')
     status_move     = fields.Selection(string='Statut', selection=[('receptionne', 'Réceptionné'),('manquant', 'Manquant'), ('abime', 'Abimé'), ('autre', 'Autre')])
+    creer_fnc_vsb   = fields.Boolean(string='Créer FNC visibility', compute='_compute_creer_fnc_vsb', readonly=True, store=False)
+
 
     def init(self):
         drop_view_if_exists(self.env.cr, self._table)
@@ -58,4 +71,11 @@ class is_stock_move_line(models.Model):
     def creer_fnc_action(self):
         for obj in self:
             res=obj.move_line_id.creer_fnc_action()
+            return res
+
+
+    @api.multi
+    def acces_fnc_action(self):
+        for obj in self:
+            res=obj.move_line_id.acces_fnc_action()
             return res
