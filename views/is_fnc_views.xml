@@ -66,6 +66,7 @@
                 <field name="status_move"/>
                 <field name="description"/>
                 <field name="cause"/>
+                <field name="date_cloture"/>
                 <field name="state"/>
             </tree>
         </field>
