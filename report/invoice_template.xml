@@ -129,7 +129,7 @@
                         <tr>
                             <t t-set="colspan" t-value="6"/>
                             <th class="text-left">
-                                <span>Description</span>
+                                <span>Désignation</span>
                             </th>
                             <th class="d-none text-left">
                                 <span>Source Document</span>
