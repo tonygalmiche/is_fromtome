@@ -17,13 +17,13 @@ class is_stock_move_line(models.Model):
     product_id      = fields.Many2one('product.product', "Article")
     product_tmpl_id = fields.Many2one('product.template', "Modèle d'article")
     move_id         = fields.Many2one('stock.move', 'Mouvement de stock')
+    move_line_id    = fields.Many2one('stock.move.line', 'Ligne de mouvement de stock')
     lot_id          = fields.Many2one('stock.production.lot', 'Lot')
     life_use_date   = fields.Datetime('DLC/DDM')
     product_uom_id  = fields.Many2one('uom.uom', 'Unité')
     qty_done        = fields.Float('Qt')
     weight          = fields.Char('Poids')
-    status_move     = fields.Char('Statut')
-
+    status_move     = fields.Selection(string='Statut', selection=[('receptionne', 'Réceptionné'),('manquant', 'Manquant'), ('abime', 'Abimé'), ('autre', 'Autre')])
 
     def init(self):
         drop_view_if_exists(self.env.cr, self._table)
@@ -39,6 +39,7 @@ class is_stock_move_line(models.Model):
                     l.product_id,
                     pp.product_tmpl_id,
                     l.move_id,
+                    l.id move_line_id,
                     l.lot_id,
                     l.life_use_date,
                     l.product_uom_id,
@@ -51,3 +52,10 @@ class is_stock_move_line(models.Model):
                                        join stock_picking p on l.picking_id=p.id
             )
         """)
+
+
+    @api.multi
+    def creer_fnc_action(self):
+        for obj in self:
+            res=obj.move_line_id.creer_fnc_action()
+            return res

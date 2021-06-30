@@ -15,7 +15,7 @@ class IsFNC(models.Model):
     lot_id           = fields.Many2one('stock.production.lot', 'N° de lot')
     dlc_ddm          = fields.Date('DLC/DDM')
     status_move      = fields.Selection(string='Statut', selection=[('receptionne', 'Réceptionné'),('manquant', 'Manquant'), ('abime', 'Abimé'), ('autre', 'Autre')], required=True)
-    description      = fields.Text('Desciption de la non-conformité')
+    description      = fields.Text('Description de la non-conformité')
     cause            = fields.Text('Causes')
     action_immediate = fields.Text('Action immédiate')
     state            = fields.Selection([

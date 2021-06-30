@@ -39,6 +39,11 @@
                 <field name="product_uom_id"/>
                 <field name="qty_done"/>
                 <field name="weight"/>
+                <button 
+                    string="Créer FNC" 
+                    name="creer_fnc_action" 
+                    type="object" icon="fa-plus" 
+                />
                 <field name="status_move"/>
             </tree>
         </field>
