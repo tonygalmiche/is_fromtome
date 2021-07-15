@@ -85,7 +85,7 @@ class StockProductionLot(models.Model):
     #    self._add_sql_constraints()
 
 
-    @api.constrains('name','product_id','is_company_id','active')
+    @api.constrains('name','product_id','is_company_id')
     def _check_lot_unique(self):
         for obj in self:
             filtre=[
@@ -95,6 +95,11 @@ class StockProductionLot(models.Model):
                 ('is_company_id', '=', obj.is_company_id.id),
             ]
             lots = self.env['stock.production.lot'].search(filtre, limit=1)
+
+            for lot in lots:
+                print(lot.name)
+
+
             if lots:
                 raise Warning("Ce lot existe déjà !") 
 
