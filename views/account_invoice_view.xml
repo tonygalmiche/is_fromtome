@@ -35,6 +35,9 @@
             <field name="partner_shipping_id" position="attributes">
                 <attribute name="domain">['|',('id','=',partner_id),('parent_id','=',partner_id)]</attribute>
             </field>
+            <xpath expr="//page[1]/field[@name='invoice_line_ids']/tree/field[@name='quantity']" position="before">
+                <field name="is_colis" sum="Total"/>
+            </xpath>
         </field>
     </record>
 
