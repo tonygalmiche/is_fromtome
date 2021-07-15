@@ -40,9 +40,11 @@
                 <field name="lot"/>
                 <field name="dluo"/>
                 <field name="dlc"/>
-                <field name="poids"/>
-                <field name="nb_pieces"/>
-                <field name="create_date"/>
+                <field name="poids"      sum="Total"/>
+                <field name="nb_pieces"  sum="Total"/>
+                <field name="qt_imprime" sum="Total"/>
+                <field name="create_date" string="Créée le"/>
+                <field name="write_date"  string="Modifiée le"/>
             </tree>
         </field>
     </record>
@@ -58,11 +60,32 @@
            </search>
         </field>
     </record>
+
+    <record id="is_imprimer_etiquette_gs1c_pivot" model="ir.ui.view">
+        <field name="name">is_imprimer_etiquette_gs1c_pivot</field>
+        <field name="model">is.imprimer.etiquette.gs1</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="create_date" type="row" interval="week"/>
+                <field name="qt_imprime"  type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="is_imprimer_etiquette_gs1_graph" model="ir.ui.view">
+        <field name="name">is_imprimer_etiquette_gs1_graph</field>
+        <field name="model">is.imprimer.etiquette.gs1</field>
+        <field name="arch" type="xml">
+            <graph type="bar" orientation="vertical" stacked="False">
+                <field name="create_date"   type="row" interval="week"/>
+                <field name="qt_imprime"  type="measure"/>
+            </graph>
+        </field>
+    </record>
     <record  id="is_imprimer_etiquette_gs1_action" model="ir.actions.act_window">
         <field name="name">Impression étiquette GS1</field>
         <field name="res_model">is.imprimer.etiquette.gs1</field>
         <field name="view_type">form</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
         <field name="domain">[]</field>
     </record>
     <menuitem

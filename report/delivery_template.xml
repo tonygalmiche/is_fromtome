@@ -199,8 +199,10 @@
                                                 </t>
                                                 <strong>Quant:</strong>
                                                 <span t-esc="ddms[ddm]['weight']" style="margin:0 !important;"/>
-                                                <strong>Colis:</strong>
-                                                <span t-esc="ddms[ddm]['qty_done']" style="margin:0 !important;"/>
+                                                <t t-if="o.company_id.name=='FROMTOME'">
+                                                    <strong>Colis:</strong>
+                                                    <span t-esc="ddms[ddm]['qty_done']" style="margin:0 !important;"/>
+                                                </t>
                                                 <br/>
                                             </t>
                                         </t>
