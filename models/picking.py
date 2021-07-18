@@ -65,9 +65,18 @@ class Picking(models.Model):
                 # self.env.user.notify_warning(message=message)
                 line.is_quantity_done_editable = True
             if line:
+
+
+                print("#### line.is_colis=",line.is_colis)
+
+
                 if line.reserved_availability >= line.quantity_done+qty:
                     if line.is_colis:
                         line.move_line_ids[0].qty_done += qty
+                    else:
+                        nb_pieces = line.product_id.weight or 1
+                        line.move_line_ids[0].qty_done += qty*nb_pieces
+
                     line.move_line_ids[0].split_qty()
 
 
