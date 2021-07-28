@@ -66,7 +66,12 @@ class Picking(models.Model):
                         line.move_line_ids[0].qty_done += qty
                     else:
                         nb_pieces = line.product_id.weight or 1
-                        line.move_line_ids[0].qty_done += qty*nb_pieces
+                        qt = qty*nb_pieces
+                        vals={
+                            "product_uom_qty": qt,
+                            "qty_done"       : qt,
+                        }
+                        line.move_line_ids[0].write(vals)
                     line.move_line_ids[0].split_qty()
                     message = "%s : %s : qt=%s " % (paris_now, product.name, line.quantity_done)
                     self.is_info=message
@@ -148,6 +153,11 @@ class Picking(models.Model):
                 elif str(barcode)[:2] in ("31"):
                     decimal = int(str(barcode)[3])
                     code = float(str(barcode)[4:-decimal] + '.' + str(barcode)[-decimal:])
+
+
+                    print("## TEST ",decimal,code)
+
+
                     self.is_scan_poids = code
                     if line.move_line_ids[n].weight_uom_id.category_id.name == "Poids":
                         if not line.is_colis:
@@ -166,9 +176,15 @@ class Picking(models.Model):
                                 "product_weight" : qt,
                             }
                         line.move_line_ids[n].write(vals)
+                        print("## TEST 1 ##",vals)
                     else:
+
+
                         product_weight = code * line.move_line_ids[n].product_uom_qty
                         line.move_line_ids[n].write({'product_weight': product_weight})
+                        print("## TEST 2 ##",product_weight)
+
+
                     line._cal_move_weight()
         return True
 
