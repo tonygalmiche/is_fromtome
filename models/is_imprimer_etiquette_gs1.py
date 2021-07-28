@@ -89,6 +89,8 @@ class IsImprimerEtiquetteGS1(models.Model):
                 gs1+=" (17)"+obj.dlc.strftime("%y%m%d")
             gs1+=" (3103)"+("000000"+str(int(obj.poids*1000)))[-6:]
             gs1+=" (10)"+lot
+            if obj.nb_pieces>1:
+                gs1+=" (37)"+("00"+str(obj.nb_pieces))[-2:]
             ZPL="""
 ^XA
 ^CI28

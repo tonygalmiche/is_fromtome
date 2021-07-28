@@ -37,8 +37,6 @@ class Picking(models.Model):
             else:
                 alerte=False
             obj.is_alerte=alerte
-            #obj.is_info=False
-
 
     is_alerte      = fields.Text('Alerte', copy=False, compute=_compute_is_alerte)
     is_info        = fields.Text('Info'  , copy=False, compute=_compute_is_alerte)
@@ -61,8 +59,6 @@ class Picking(models.Model):
 
         if str(barcode)[:2] in ("01","02"):
             if line.show_details_visible:
-                # message = _('For %s it is necessary to specify some details.') % (product.name)
-                # self.env.user.notify_warning(message=message)
                 line.is_quantity_done_editable = True
             if line:
                 if line.reserved_availability >= line.quantity_done+qty:
@@ -78,44 +74,32 @@ class Picking(models.Model):
                     message = "%s : %s : qt=%s : Quantité réservée de %s atteinte " % (paris_now, product.name, line.quantity_done, line.reserved_availability)
                     self.is_alerte = message
                     self.is_info   = False
-
             else:
                 message = "L'article %s n'est pas sur ce document !" %  product.name_get()[0][1]
                 self.is_alerte = message
-
-                # if self.state == 'draft':
-                #     vals = {
-                #         'product_id': product.id,
-                #         'product_uom': product.uom_id.id,
-                #         'quantity_done': 1,
-                #         'date_expected': fields.Datetime.now(),
-                #         'location_id': self.location_id.id,
-                #         'location_dest_id': self.location_dest_id.id,
-                #         'state': 'draft',
-                #     }
-                #     line = self.move_lines.new(vals)
-                #     line.onchange_product_id()
-                #     self.move_lines += line
-                # else:
-                #     message = _('%s n existe pas !') %  product.name
-                #     self.env.user.notify_danger(message=message)
         else:
             code = str(barcode)[2:]
             n=len(line.move_line_ids)-1
-
-            print("## code,n=",code,n)
-
-
-
             if n>0:
                 if str(barcode)[:2] in ("10"):
+                    #** Recherche code 37 après le lot (Le 28/07/21) **********
+                    suffix = code[-4:]
+                    if suffix[:2]=="37":
+                        code = code[:len(code)-4]
+                        is_scan_qty = int(suffix[-2:])
+                        if is_scan_qty>1:
+                            self.is_scan_qty=is_scan_qty
+                            line.move_line_ids[n].write({"product_uom_qty" : is_scan_qty*line.move_line_ids[n].product_uom_qty})
+                            line.move_line_ids[n].write({"qty_done"        : is_scan_qty*line.move_line_ids[n].qty_done})
+                    #**********************************************************
+
                     # Modif faite le 21/05/2021 pour mettre la quantité sur les articles de type Pièce
                     if product:
                         if product.uom_id.category_id.name=="Pièce":
                             qty=product.uom_id.factor_inv or 1
                             if qty <1:
                                 qty=1
-                            line.move_line_ids[n].write({'weight': qty})
+                            line.move_line_ids[n].write({'weight': qty*is_scan_qty})
                     line.move_line_ids[n].write({'lot_name' : code} )
                     lot = self.env['stock.production.lot'].search([('name','=',code),('product_id','=',product.id)],limit=1)
                     if lot:
@@ -129,8 +113,6 @@ class Picking(models.Model):
                     line.move_line_ids[n].write({'picking_id': picking_id,'lot_id': lot.id})
 
                     self.is_scan_lot_id = lot.id
-
-
 
                     if self.is_info:
                         self.is_info+=" : "+message
@@ -153,10 +135,7 @@ class Picking(models.Model):
                     line.move_line_ids[n].write({"life_use_date": date_due} )
                     line.move_line_ids[n].lot_id.write({"use_date": date_due})
 
-
                     self.is_scan_ddm = date_due.strftime('%Y-%m-%d')
-
-
 
                 elif str(barcode)[:2] in ("17"):
                     life_use_date = dateparser.parse(code, date_formats=['%y%m%d'])
@@ -165,45 +144,28 @@ class Picking(models.Model):
 
                     self.is_scan_dlc = life_use_date.strftime('%Y-%m-%d')
 
-
-
-
                 elif str(barcode)[:2] in ("31"):
                     decimal = int(str(barcode)[3])
                     code = float(str(barcode)[4:-decimal] + '.' + str(barcode)[-decimal:])
-
                     self.is_scan_poids = code
-
                     if line.move_line_ids[n].weight_uom_id.category_id.name == "Poids":
-
                         if not line.is_colis:
-                            print("## Poids pour Fromelier : is_scan_poids =",code,line.is_colis)
                             vals={
                                 "product_uom_qty": code,
                                 "qty_done"       : code,
                                 "weight"         : code * line.move_line_ids[n].product_uom_qty,
                                 "product_weight" : code * line.move_line_ids[n].product_uom_qty,
                             }
-                            line.move_line_ids[n].write(vals)
-
-                        line.move_line_ids[n].write({'weight': code * line.move_line_ids[n].product_uom_qty, 'product_weight':code * line.move_line_ids[n].product_uom_qty} )
+                        else:
+                            vals={
+                                "weight"         : code * line.move_line_ids[n].product_uom_qty,
+                                "product_weight" : code * line.move_line_ids[n].product_uom_qty,
+                            }
+                        line.move_line_ids[n].write(vals)
                     else:
                         product_weight = code * line.move_line_ids[n].product_uom_qty
-
-                        print("### decimal,code=",decimal,code,product_weight)
-
-
                         line.move_line_ids[n].write({'product_weight': product_weight})
-
-
                     line._cal_move_weight()
-                # elif str(barcode)[:2] in ("37"):
-                #     line.move_line_ids[n].write({'qty_done':  int(code),'weight':line.move_line_ids[n].product_id.weight * int(code)} )
-                #     line.move_line_ids[n].write({'product_uom_qty':  int(code)} )
-                #     line.move_line_ids[0].write({'product_uom_qty':  line.move_line_ids[0].product_uom_qty - int(code) + 1} )
-                #else:
-                #    return True
-
         return True
 
 
