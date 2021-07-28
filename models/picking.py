@@ -52,11 +52,11 @@ class Picking(models.Model):
         is_scan_qty = 1
         tz = pytz.timezone('Europe/Paris')
         paris_now = datetime.now(tz).strftime("%H:%M:%S")
-
         line = self.move_ids_without_package.filtered(lambda r: r.product_id.id == product.id)
+        if len(line)>1:
+            raise UserError("Il y a 2 lignes sur l'article %s"%(line[0].product_id.default_code))
         if line.move_line_ids:
             line.move_line_ids[0].write({'weight_uom_id': line.product_id.weight_uom_id.id})
-
         if str(barcode)[:2] in ("01","02"):
             if line.show_details_visible:
                 line.is_quantity_done_editable = True
