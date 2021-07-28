@@ -50,10 +50,10 @@ class is_stock_move_line(models.Model):
                 select 
                     l.id,
                     pt.company_id,
-                    l.picking_id,
+                    m.picking_id,
                     p.picking_type_id,
                     m.partner_id,
-                    l.product_id,
+                    m.product_id,
                     pp.product_tmpl_id,
                     l.move_id,
                     l.id move_line_id,
