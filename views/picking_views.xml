@@ -33,6 +33,15 @@
                     <field name="is_alerte" invisible="1"/>
                     <button class="oe_stat_button" icon="fa-exclamation" type="object" name="#" string="Alerte sur les lots" attrs="{'invisible': [('is_alerte', '=', False)]}"/>
                 </field>
+
+
+               <field name="batch_id" position="replace">
+                    <field name="create_date"/>
+                    <field name="write_date"/>
+                </field>
+
+
+
             </field>
         </record>
 

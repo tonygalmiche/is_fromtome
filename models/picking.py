@@ -43,172 +43,85 @@ class Picking(models.Model):
 
 
     def _add_product(self, product, barcode, qty=1.0):
+        print("### _add_product : barcode,product,qty =",self.state, barcode,product,qty)
 
-
-        print("##### barcode,product,qty = ",self,barcode,product,qty)
-
-
-
-        #if product:
-        #    qty=product.uom_id.factor_inv or 1
-
-        #print("## qty=",qty)
-
+        tz = pytz.timezone('Europe/Paris')
+        paris_now = datetime.now(tz).strftime("%H:%M:%S")
 
         line = self.move_ids_without_package.filtered(lambda r: r.product_id.id == product.id)
         if line.move_line_ids:
             line.move_line_ids[0].write({'weight_uom_id': line.product_id.weight_uom_id.id})
 
-        if not barcode or str(barcode)[:2] in ("01","02"):
+        if str(barcode)[:2] in ("01","02"):
             if line.show_details_visible:
                 # message = _('For %s it is necessary to specify some details.') % (product.name)
                 # self.env.user.notify_warning(message=message)
                 line.is_quantity_done_editable = True
             if line:
-
-
-                print("#### line.is_colis=",line.is_colis)
-
-
                 if line.reserved_availability >= line.quantity_done+qty:
                     if line.is_colis:
                         line.move_line_ids[0].qty_done += qty
                     else:
                         nb_pieces = line.product_id.weight or 1
                         line.move_line_ids[0].qty_done += qty*nb_pieces
-
                     line.move_line_ids[0].split_qty()
-
-
-
-
-                    tz = pytz.timezone('Europe/Paris')
-                    paris_now = datetime.now(tz).strftime("%H:%M:%S")
-
-                    #line.quantity_done += qty
-                    message = _("%s : %s : qt=%s ") % (paris_now, product.name, line.quantity_done)
-                    #raise UserError(message)
-                    #self.env.user.notify_info(message=message)
+                    message = "%s : %s : qt=%s " % (paris_now, product.name, line.quantity_done)
                     self.is_info=message
-
-
-                    #if self.is_info:
-                    #    self.is_info+="\n"+message
-                    #else:
-                    #    self.is_info=message
-
-
-
-
                 else:
-                    message = 'La quantité réservée de '+str(line.reserved_availability)+' est déja atteinte !'
+                    message = "%s : %s : qt=%s : Quantité réservée de %s atteinte " % (paris_now, product.name, line.quantity_done, line.reserved_availability)
                     self.is_alerte = message
-                    #self.is_info   = False
+                    self.is_info   = False
 
-
-                    #raise UserError(message)
-                    #self.env.user.notify_warning(message=message)
             else:
-                if self.state == 'draft':
-                    vals = {
-                        'product_id': product.id,
-                        'product_uom': product.uom_id.id,
-                        # 'product_uom_qty':1,
-                        # 'ordered_qty':1,
-                        'quantity_done': 1,
-                        'date_expected': fields.Datetime.now(),
-                        'location_id': self.location_id.id,
-                        'location_dest_id': self.location_dest_id.id,
-                        'state': 'draft',
-                    }
+                message = "L'article %s n'est pas sur ce document !" %  product.name_get()[0][1]
+                self.is_alerte = message
 
-
-                    #print("## vals =",vals)
-
-
-                    line = self.move_lines.new(vals)
-                    line.onchange_product_id()
-                    self.move_lines += line
-
-                else:
-                    message = _('%s n existe pas !') %  product.name
-                    self.env.user.notify_danger(message=message)
+                # if self.state == 'draft':
+                #     vals = {
+                #         'product_id': product.id,
+                #         'product_uom': product.uom_id.id,
+                #         'quantity_done': 1,
+                #         'date_expected': fields.Datetime.now(),
+                #         'location_id': self.location_id.id,
+                #         'location_dest_id': self.location_dest_id.id,
+                #         'state': 'draft',
+                #     }
+                #     line = self.move_lines.new(vals)
+                #     line.onchange_product_id()
+                #     self.move_lines += line
+                # else:
+                #     message = _('%s n existe pas !') %  product.name
+                #     self.env.user.notify_danger(message=message)
         else:
             code = str(barcode)[2:]
             n=len(line.move_line_ids)-1
             if n>0:
                 if str(barcode)[:2] in ("10"):
-
-
-                    #print("###### barcode = ",n,barcode)
-
-
                     # Modif faite le 21/05/2021 pour mettre la quantité sur les articles de type Pièce
                     if product:
                         if product.uom_id.category_id.name=="Pièce":
                             qty=product.uom_id.factor_inv or 1
                             if qty <1:
                                 qty=1
-
-
-                            #print("###### qty = ",n,barcode,qty)
-
-
                             line.move_line_ids[n].write({'weight': qty})
-
-                    #print("######  weight 1 =",line.move_line_ids[n].weight)
-
-
                     line.move_line_ids[n].write({'lot_name' : code} )
-                    lot = self.env['stock.production.lot'].search([('name','=',code)],limit=1)
-                    if not lot:
+                    lot = self.env['stock.production.lot'].search([('name','=',code),('product_id','=',product.id)],limit=1)
+                    if lot:
+                        message = "Lot numéro  %s'" % (lot.name)
+                    else:
                         lot = self.env['stock.production.lot'].create(
                             {'name': code, 'product_id': product.id}
                         )
-                        message = _('lot créé  %s') % (lot.name)
-                        self.env.user.notify_info(message=message)
-
-
-
+                        message = "Création lot %s" % (lot.name)
                     picking_id = line.move_line_ids[0].picking_id.id
-                    print("### TEST ",self,picking_id)
-
-
                     line.move_line_ids[n].write({'picking_id': picking_id,'lot_id': lot.id})
-                    #line.move_line_ids[n].write({'lot_id': lot.id})
-
-
-
-                    #print("######  weight 2 =",line.move_line_ids[n].weight)
-
-
-                    message = _('lot numéro  %s') % (lot.name)
-                    #self.env.user.notify_info(message=message)
                     if self.is_info:
                         self.is_info+=" : "+message
                     else:
                         self.is_info=message
 
-
-
-
-
                 elif str(barcode)[:2] in ("15"):
-                    # date_due = dateparser.parse(code, date_formats=['%y%m%d'])
-                    # contrat_date_obj = self.env['contrat.date.client'].search([('partner_id','=',self.partner_id.id),('product_id','=',self.product_id.id)],limit=1)
-                    # contrat_date = datetime.now() + timedelta(days=contrat_date_obj.name)
-                    # print('-date duee---',date_due)
-                    # print('-obj contrat date---',contrat_date_obj)
-                    # print('contrat date----',contrat_date)
-                    # if contrat_date_obj and contrat_date.date() > date_due.date():
-                    #     print('---- okkk pass date')
-                    # else:
-                    #     print('-- no pass date')
-
                     date_due = dateparser.parse(code, date_formats=['%y%m%d'])
-
-                    #print("## barcode,date_due = ",n,barcode,date_due)
-
                     contrat_date_obj = self.env['contrat.date.client'].search(
                         [('partner_id', '=', self.partner_id.id),
                          ('product_id', '=', product.product_tmpl_id.id)], limit=1)
@@ -220,11 +133,8 @@ class Picking(models.Model):
                     elif date_due and date_due.date() == datetime.now().date():
                         raise UserError(_('Vérifiez date expiration produit !'))
 
-
-                    print("#### life_use_date=",date_due,line.move_line_ids[n])
                     line.move_line_ids[n].write({"life_use_date": date_due} )
                     line.move_line_ids[n].lot_id.write({"use_date": date_due})
-
 
 
                 elif str(barcode)[:2] in ("17"):
@@ -236,31 +146,11 @@ class Picking(models.Model):
                     decimal = int(str(barcode)[3])
                     code = float(str(barcode)[4:-decimal] + '.' + str(barcode)[-decimal:])
 
-                    #print("## barcode,decimal,code = ",n,barcode,decimal,code,line.move_line_ids[n].weight_uom_id.category_id.name)
-
-
-
                     if line.move_line_ids[n].weight_uom_id.category_id.name == "Poids":
                         line.move_line_ids[n].write({'weight': code * line.move_line_ids[n].product_uom_qty, 'product_weight':code * line.move_line_ids[n].product_uom_qty} )
                     else:
-
                         product_weight = code * line.move_line_ids[n].product_uom_qty
-
-                        #print("## barcode,decimal,code,product_weight = ",n,barcode,decimal,code,product_weight)
-
-
                         line.move_line_ids[n].write({'product_weight': product_weight})
-                        #line.move_line_ids[n].write({'weight': 123})
-
-
-                        #line.move_line_ids[n].write({'qty_done': 12})
-
-
-
-                        #print("## barcode,move_line_ids = ",line.move_line_ids[n], line.move_line_ids[n].weight)
-
-
-
 
 
                     line._cal_move_weight()
@@ -275,62 +165,23 @@ class Picking(models.Model):
 
 
     def on_barcode_scanned(self, barcode):
-        #print('barcode---',barcode,self.env.user,self)
-
-        #if self.is_info:
-        #    self.is_info+="\n"+barcode
-        #else:
-        #    self.is_info=barcode
-
-
-        if self.state not in ['draft', 'assigned']:
+        #print('### barcode =',barcode)
+        if self.state not in ['assigned']:
             self.is_alerte="Le BL doit-être à l'état Prêt !"
-            #self.env.user.notify_danger(message=_('Status does not allow scanning') )
             return
-        product = self.env['product.product'].search([('barcode', '=', barcode)])
-
-        #print('## TEST 1 barcode,product',barcode,product)
-
-
-
-        today = datetime.now().date()
-        if not product:
-            product_tmpl = self.env['product.supplierinfo'].search([('barcode', '=', barcode),('date_end','>=',today)],limit=1).product_tmpl_id
-            product = self.env['product.product'].search([('product_tmpl_id', '=', product_tmpl.id)],limit=1)
-
-
-        #print('## TEST 2 barcode,product',barcode,product)
-
-
-
-
-
-        if product:
-            message = _('product ean13 yes is  %s') % (product.name)
-            self.env.user.notify_info(message=message)
-            self._add_product(product,False)
-
-        elif str(barcode)[:2] in ("01","02"):
+        if str(barcode)[:2] in ("01","02"):
             pr_barcode =  str(barcode)[2:]
-            product = self.env['product.product'].search([('barcode', '=',str(barcode)[2:])])
-            if not product:
-                product_tmpl = self.env['product.supplierinfo'].search([('barcode', '=', str(barcode)[2:]),('date_end','>=',today)],limit=1).product_tmpl_id
-                product = self.env['product.product'].search([('product_tmpl_id', '=', product_tmpl.id)],limit=1)
+            product = self.env['product.product'].search([('barcode', '=',pr_barcode)])
             if product:
                 self._add_product(product, barcode)
                 self.barcode_product_id =  product.id
+            else:
+                self.barcode_product_id = False
+                self.is_alerte="Code EAN %s non trouvé" % pr_barcode
+                return
 
-
-            #print('## TEST 3 barcode,product',barcode,product)
-
-
-
-
-        elif str(barcode)[:2] in ('10','15','17','31','37'):
+        if self.barcode_product_id and str(barcode)[:2] in ('10','15','17','31','37'):
             self._add_product(self.barcode_product_id, barcode)
-        else:
-            self.barcode_product_id = False
-            self.env.user.notify_danger(message=_('There is no product with barcode %s') % barcode )
 
 
     @api.multi
