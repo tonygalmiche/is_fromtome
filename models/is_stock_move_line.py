@@ -33,10 +33,13 @@ class is_stock_move_line(models.Model):
     type_traçabilite= fields.Selection(string='Traçabilité', selection=[('ddm', 'DDM'), ('dlc', 'DLC')])
     life_use_date   = fields.Datetime('DLC/DDM')
     product_uom_id  = fields.Many2one('uom.uom', 'Unité')
-    qty_done        = fields.Float('Qt')
-    weight          = fields.Char('Poids')
+    product_uom_qty = fields.Float('Réservé')
+    qty_done        = fields.Float('Fait')
+    weight          = fields.Char('Qt réelle')
     status_move     = fields.Selection(string='Statut', selection=[('receptionne', 'Réceptionné'),('manquant', 'Manquant'), ('abime', 'Abimé'), ('autre', 'Autre')])
     creer_fnc_vsb   = fields.Boolean(string='Créer FNC visibility', compute='_compute_creer_fnc_vsb', readonly=True, store=False)
+    create_date     = fields.Datetime('Date de création')
+    write_date      = fields.Datetime('Date de modification')
 
 
     def init(self):
@@ -58,9 +61,12 @@ class is_stock_move_line(models.Model):
                     pt.type_traçabilite,
                     l.life_use_date,
                     l.product_uom_id,
+                    l.product_uom_qty,
                     l.qty_done,
                     l.weight,
-                    l.status_move
+                    l.status_move,
+                    l.create_date,
+                    l.write_date
                 from stock_move_line l join product_product pp on l.product_id=pp.id 
                                        join product_template pt on pp.product_tmpl_id=pt.id
                                        join stock_move m on l.move_id=m.id
