@@ -67,10 +67,10 @@ class is_stock_move_line(models.Model):
                     l.status_move,
                     l.create_date,
                     l.write_date
-                from stock_move_line l join product_product pp on l.product_id=pp.id 
+                from stock_move_line l join stock_move m on l.move_id=m.id
+                                       join stock_picking p on m.picking_id=p.id
+                                       join product_product pp on m.product_id=pp.id 
                                        join product_template pt on pp.product_tmpl_id=pt.id
-                                       join stock_move m on l.move_id=m.id
-                                       join stock_picking p on l.picking_id=p.id
             )
         """)
 
