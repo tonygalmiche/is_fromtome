@@ -9,7 +9,6 @@
             <field name="arch" type="xml">
                 <form position="inside">
                     <field name="_barcode_scanned" widget="barcode_handler"/>
-                    <field name="barcode_product_id" invisible="1"/>
                 </form>
                 <field name="name" position="before">
                     <field 
@@ -20,6 +19,14 @@
                         name="is_info"
                         style="background-color:chartreuse;font-size:13pt" 
                         attrs="{'invisible': [('is_info','=', False)],'readonly':True}"/>
+                </field>
+                <field name="origin" position="after">
+                    <field name="barcode_product_id" attrs="{'invisible': [('barcode_product_id','=', False)], 'readonly':True}"/>
+                    <field name="is_scan_lot_id"     attrs="{'invisible': [('is_scan_lot_id','=', False)]    , 'readonly':True}"/>
+                    <field name="is_scan_dlc"        attrs="{'invisible': [('is_scan_dlc','=', False)]       , 'readonly':True}"/>
+                    <field name="is_scan_ddm"        attrs="{'invisible': [('is_scan_ddm','=', False)]       , 'readonly':True}"/>
+                    <field name="is_scan_qty"        attrs="{'invisible': [('is_scan_qty','=', 0)]           , 'readonly':True}"/>
+                    <field name="is_scan_poids"      attrs="{'invisible': [('is_scan_poids','=', 0)]         , 'readonly':True}"/>
                 </field>
             </field>
         </record>

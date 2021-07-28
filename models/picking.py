@@ -22,6 +22,8 @@ class Picking(models.Model):
     _inherit = ['stock.picking', 'barcodes.barcode_events_mixin']
 
 
+    scans=[]
+
     @api.onchange('move_ids_without_package')
     def _compute_is_alerte(self):
         for obj in self:
@@ -38,8 +40,13 @@ class Picking(models.Model):
             #obj.is_info=False
 
 
-    is_alerte = fields.Text('Alerte', copy=False, compute=_compute_is_alerte)
-    is_info   = fields.Text('Info'  , copy=False, compute=_compute_is_alerte)
+    is_alerte      = fields.Text('Alerte', copy=False, compute=_compute_is_alerte)
+    is_info        = fields.Text('Info'  , copy=False, compute=_compute_is_alerte)
+    is_scan_lot_id = fields.Many2one('stock.production.lot','Lot scanné ', help="(10)", readonly=True)
+    is_scan_dlc    = fields.Date('DLC scannée'  , help="(17)"  , readonly=True)
+    is_scan_ddm    = fields.Date('DDM scannée'  , help="(15)"  , readonly=True)
+    is_scan_qty    = fields.Float('Qt scannée'  , help="(37)"  , readonly=True)
+    is_scan_poids  = fields.Float('Poids scanné', help="(3103)", readonly=True)
 
 
     def _add_product(self, product, barcode, qty=1.0):
@@ -95,6 +102,11 @@ class Picking(models.Model):
         else:
             code = str(barcode)[2:]
             n=len(line.move_line_ids)-1
+
+            print("## code,n=",code,n)
+
+
+
             if n>0:
                 if str(barcode)[:2] in ("10"):
                     # Modif faite le 21/05/2021 pour mettre la quantité sur les articles de type Pièce
@@ -115,6 +127,11 @@ class Picking(models.Model):
                         message = "Création lot %s" % (lot.name)
                     picking_id = line.move_line_ids[0].picking_id.id
                     line.move_line_ids[n].write({'picking_id': picking_id,'lot_id': lot.id})
+
+                    self.is_scan_lot_id = lot.id
+
+
+
                     if self.is_info:
                         self.is_info+=" : "+message
                     else:
@@ -137,19 +154,45 @@ class Picking(models.Model):
                     line.move_line_ids[n].lot_id.write({"use_date": date_due})
 
 
+                    self.is_scan_ddm = date_due.strftime('%Y-%m-%d')
+
+
+
                 elif str(barcode)[:2] in ("17"):
-                    line.move_line_ids[n].write({"life_use_date" : dateparser.parse(code, date_formats=['%y%m%d'])} )
-                    line.move_line_ids[n].lot_id.write({"life_date": dateparser.parse(code, date_formats=['%y%m%d'])})
+                    life_use_date = dateparser.parse(code, date_formats=['%y%m%d'])
+                    line.move_line_ids[n].write({"life_use_date" : life_use_date})
+                    line.move_line_ids[n].lot_id.write({"life_date": life_use_date})
+
+                    self.is_scan_dlc = life_use_date.strftime('%Y-%m-%d')
+
+
 
 
                 elif str(barcode)[:2] in ("31"):
                     decimal = int(str(barcode)[3])
                     code = float(str(barcode)[4:-decimal] + '.' + str(barcode)[-decimal:])
 
+                    self.is_scan_poids = code
+
                     if line.move_line_ids[n].weight_uom_id.category_id.name == "Poids":
+
+                        if not line.is_colis:
+                            print("## Poids pour Fromelier : is_scan_poids =",code,line.is_colis)
+                            vals={
+                                "product_uom_qty": code,
+                                "qty_done"       : code,
+                                "weight"         : code * line.move_line_ids[n].product_uom_qty,
+                                "product_weight" : code * line.move_line_ids[n].product_uom_qty,
+                            }
+                            line.move_line_ids[n].write(vals)
+
                         line.move_line_ids[n].write({'weight': code * line.move_line_ids[n].product_uom_qty, 'product_weight':code * line.move_line_ids[n].product_uom_qty} )
                     else:
                         product_weight = code * line.move_line_ids[n].product_uom_qty
+
+                        print("### decimal,code=",decimal,code,product_weight)
+
+
                         line.move_line_ids[n].write({'product_weight': product_weight})
 
 
@@ -165,7 +208,12 @@ class Picking(models.Model):
 
 
     def on_barcode_scanned(self, barcode):
-        #print('### barcode =',barcode)
+        print('### barcode =',barcode)
+
+        self.scans.append(barcode)
+        #print(self.scans)
+
+
         if self.state not in ['assigned']:
             self.is_alerte="Le BL doit-être à l'état Prêt !"
             return
