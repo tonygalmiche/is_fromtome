@@ -65,8 +65,9 @@ class Picking(models.Model):
                     if line.is_colis:
                         line.move_line_ids[0].qty_done += qty
                     else:
-                        nb_pieces = line.product_id.weight or 1
-                        qt = qty*nb_pieces
+                        #nb_pieces = line.product_id.weight or 1
+                        #qt = qty*nb_pieces
+                        qt = qty
                         vals={
                             "product_uom_qty": qt,
                             "qty_done"       : qt,
