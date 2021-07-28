@@ -49,7 +49,7 @@ class Picking(models.Model):
 
     def _add_product(self, product, barcode, qty=1.0):
         print("### _add_product : barcode,product,qty =",self.state, barcode,product,qty)
-
+        is_scan_qty = 1
         tz = pytz.timezone('Europe/Paris')
         paris_now = datetime.now(tz).strftime("%H:%M:%S")
 

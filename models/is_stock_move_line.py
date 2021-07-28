@@ -30,6 +30,7 @@ class is_stock_move_line(models.Model):
     move_id         = fields.Many2one('stock.move', 'Mouvement de stock')
     move_line_id    = fields.Many2one('stock.move.line', 'Ligne de mouvement de stock')
     lot_id          = fields.Many2one('stock.production.lot', 'Lot')
+    type_traçabilite= fields.Selection(string='Traçabilité', selection=[('ddm', 'DDM'), ('dlc', 'DLC')])
     life_use_date   = fields.Datetime('DLC/DDM')
     product_uom_id  = fields.Many2one('uom.uom', 'Unité')
     qty_done        = fields.Float('Qt')
@@ -54,6 +55,7 @@ class is_stock_move_line(models.Model):
                     l.move_id,
                     l.id move_line_id,
                     l.lot_id,
+                    pt.type_traçabilite,
                     l.life_use_date,
                     l.product_uom_id,
                     l.qty_done,
