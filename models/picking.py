@@ -181,6 +181,7 @@ class Picking(models.Model):
             self.is_alerte="Le BL doit-être à l'état Prêt !"
             return
         if str(barcode)[:2] in ("01","02"):
+            self.barcode_product_id = False
             pr_barcode =  str(barcode)[2:]
             product = self.env['product.product'].search([('barcode', '=',pr_barcode)])
             if product:
