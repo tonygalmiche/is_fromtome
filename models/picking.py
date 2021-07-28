@@ -83,14 +83,15 @@ class Picking(models.Model):
             if n>0:
                 if str(barcode)[:2] in ("10"):
                     #** Recherche code 37 après le lot (Le 28/07/21) **********
-                    suffix = code[-4:]
-                    if suffix[:2]=="37":
-                        code = code[:len(code)-4]
-                        is_scan_qty = int(suffix[-2:])
-                        if is_scan_qty>1:
-                            self.is_scan_qty=is_scan_qty
-                            line.move_line_ids[n].write({"product_uom_qty" : is_scan_qty*line.move_line_ids[n].product_uom_qty})
-                            line.move_line_ids[n].write({"qty_done"        : is_scan_qty*line.move_line_ids[n].qty_done})
+                    if line.is_colis:
+                        suffix = code[-4:]
+                        if suffix[:2]=="37":
+                            code = code[:len(code)-4]
+                            is_scan_qty = int(suffix[-2:])
+                            if is_scan_qty>1:
+                                self.is_scan_qty=is_scan_qty
+                                line.move_line_ids[n].write({"product_uom_qty" : is_scan_qty*line.move_line_ids[n].product_uom_qty})
+                                line.move_line_ids[n].write({"qty_done"        : is_scan_qty*line.move_line_ids[n].qty_done})
                     #**********************************************************
 
                     # Modif faite le 21/05/2021 pour mettre la quantité sur les articles de type Pièce
