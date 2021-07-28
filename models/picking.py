@@ -158,9 +158,12 @@ class Picking(models.Model):
                                 "product_weight" : code * line.move_line_ids[n].product_uom_qty,
                             }
                         else:
+                            qt = code * line.move_line_ids[n].product_uom_qty
                             vals={
-                                "weight"         : code * line.move_line_ids[n].product_uom_qty,
-                                "product_weight" : code * line.move_line_ids[n].product_uom_qty,
+                                "product_uom_qty": qt,
+                                "qty_done"       : qt,
+                                "weight"         : qt,
+                                "product_weight" : qt,
                             }
                         line.move_line_ids[n].write(vals)
                     else:
