@@ -20,14 +20,17 @@
                         style="background-color:chartreuse;font-size:13pt" 
                         attrs="{'invisible': [('is_info','=', False)],'readonly':True}"/>
                 </field>
-                <field name="origin" position="after">
-                    <field name="barcode_product_id" attrs="{'invisible': [('barcode_product_id','=', False)], 'readonly':True}"/>
-                    <field name="is_scan_lot_id"     attrs="{'invisible': [('is_scan_lot_id','=', False)]    , 'readonly':True}"/>
-                    <field name="is_scan_dlc"        attrs="{'invisible': [('is_scan_dlc','=', False)]       , 'readonly':True}"/>
-                    <field name="is_scan_ddm"        attrs="{'invisible': [('is_scan_ddm','=', False)]       , 'readonly':True}"/>
-                    <field name="is_scan_qty"        attrs="{'invisible': [('is_scan_qty','=', 0)]           , 'readonly':True}"/>
-                    <field name="is_scan_poids"      attrs="{'invisible': [('is_scan_poids','=', 0)]         , 'readonly':True}"/>
-                </field>
+
+
+
+
+<!--                <field name="origin" position="after">-->
+<!--                    <field name="barcode_product_id" attrs="{'invisible': [('barcode_product_id','=', False)], 'readonly':True}"/>-->
+<!--                </field>-->
+
+
+
+
             </field>
         </record>
 
@@ -36,10 +39,10 @@
             <field name="model">stock.picking</field>
             <field name="inherit_id" ref="stock.vpicktree"/>
             <field name="arch" type="xml">
-               <field name="partner_id" position="before">
-                    <field name="is_alerte" invisible="1"/>
-                    <button class="oe_stat_button" icon="fa-exclamation" type="object" name="#" string="Alerte sur les lots" attrs="{'invisible': [('is_alerte', '=', False)]}"/>
-                </field>
+<!--               <field name="partner_id" position="before">-->
+<!--                    <field name="is_alerte" invisible="1"/>-->
+<!--                    <button class="oe_stat_button" icon="fa-exclamation" type="object" name="#" string="Alerte sur les lots" attrs="{'invisible': [('is_alerte', '=', False)]}"/>-->
+<!--                </field>-->
 
 
                <field name="batch_id" position="replace">
