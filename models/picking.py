@@ -68,9 +68,14 @@ class Picking(models.Model):
                         line.move_line_ids[0].qty_done += qty
                         line.move_line_ids[0].split_qty()
                     else:
-                        nb_pieces = line.product_id.weight or 1
-                        line.move_line_ids[0].qty_done += qty*nb_pieces
+                        if product.uom_id.category_id.name=="Pièce":
+                            line.move_line_ids[0].qty_done += qty
+                        else:
+                            weight = line.product_id.uom_po_id.factor_inv
+                            line.move_line_ids[0].qty_done += weight
                         line.move_line_ids[0].split_qty()
+
+
                     message = "%s : %s : qt=%s " % (paris_now, product.name, line.quantity_done)
                     self.is_info=message
                 else:
